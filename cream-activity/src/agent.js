@@ -28,7 +28,7 @@ function provideHandleTransaction(txCounter) {
     function createAlert(from, eventSig, count) {
       return Finding.fromObject({
         name: "High Transaction Activity",
-        description: `${from} called ${getEventName(eventSig)} 5 times in the last minute`,
+        description: `${from} did ${getEventName(eventSig)} 5 times in the last minute`,
         alertId: "cream-v1-eth-activity",
         severity: FindingSeverity.Medium,
         type: FindingType.Suspicious,

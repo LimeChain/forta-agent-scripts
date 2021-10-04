@@ -12,8 +12,8 @@ This agent detects when an address does high volume of interactions (borrow, min
 
 Describe each of the type of alerts fired by this agent
 
-- CREAM_HIGH_VOLUME
-  - Fired when the number of events in the last minutes for address are > 5
+- cream-v1-eth-activity
+  - Fired when an address does an action (Borrow, Mint or Redeem) 5 times in a minute
   - Severity is always set to "medium"
   - Type is always set to "suspicious"
   - Metadata fields:

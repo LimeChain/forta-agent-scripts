@@ -92,7 +92,7 @@ describe("high volume agent", () => {
       expect(findings).toStrictEqual([
         Finding.fromObject({
           name: "High Transaction Activity",
-          description: `${txEvent.from} called Borrow 5 times in the last minute`,
+          description: `${txEvent.from} did Borrow 5 times in the last minute`,
           alertId: "cream-v1-eth-activity",
           type: FindingType.Suspicious,
           severity: FindingSeverity.Medium,
