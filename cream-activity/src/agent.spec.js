@@ -29,6 +29,7 @@ describe("high volume agent", () => {
   const mockTxCounter = {
     increment: jest.fn(),
     getTransactions: jest.fn(),
+    reset: jest.fn()
   }
 
   const createTxEvent = ({ from, hash, logs, addresses, timestamp }) =>
@@ -69,7 +70,7 @@ describe("high volume agent", () => {
       })
 
       mockTxCounter.increment.mockReset()
-      mockTxCounter.increment.mockReturnValueOnce(11)
+      mockTxCounter.increment.mockReturnValueOnce(5)
       const transactions = [
         { txHash: txEvent.hash, timestamp: txEvent.timestamp },
       ]
@@ -86,11 +87,13 @@ describe("high volume agent", () => {
       )
       expect(mockTxCounter.getTransactions).toHaveBeenCalledTimes(1)
       expect(mockTxCounter.getTransactions).toHaveBeenCalledWith(txEvent.from, borrowEvent)
+      expect(mockTxCounter.reset).toHaveBeenCalledTimes(1)
+
       expect(findings).toStrictEqual([
         Finding.fromObject({
-          name: "High Transaction Volume",
-          description: `High Borrow calls (11) from ${txEvent.from}`,
-          alertId: "CREAM_HIGH_VOLUME",
+          name: "High Transaction Activity",
+          description: `${txEvent.from} called Borrow 5 times in the last minute`,
+          alertId: "cream-v1-eth-activity",
           type: FindingType.Suspicious,
           severity: FindingSeverity.Medium,
           metadata: {

@@ -2,7 +2,7 @@ const { Finding, FindingType, FindingSeverity } = require("forta-agent")
 const { contractAddress, eventSigs, countThreshold } = require("./agent-config.json")
 const TransactionCounter = require("./transaction-counter")
 
-// 60 seconds
+// Count only transactions in the last 60 seconds
 const txCounter = new TransactionCounter(60)
 
 function provideHandleTransaction(txCounter) {
@@ -18,17 +18,18 @@ function provideHandleTransaction(txCounter) {
       eventLog.forEach(() => {
         const count = txCounter.increment(from, eventSig, txHash, blockTimestamp)
         
-        if (count > countThreshold) {
+        if (count === countThreshold) {
           findings.push(createAlert(from, eventSig, count))
+          txCounter.reset(from, eventSig)
         }
       })
     })
 
     function createAlert(from, eventSig, count) {
       return Finding.fromObject({
-        name: "High Transaction Volume",
-        description: `High ${getEventName(eventSig)} calls (${count}) from ${from}`,
-        alertId: "CREAM_HIGH_VOLUME",
+        name: "High Transaction Activity",
+        description: `${from} called ${getEventName(eventSig)} 5 times in the last minute`,
+        alertId: "cream-v1-eth-activity",
         severity: FindingSeverity.Medium,
         type: FindingType.Suspicious,
         metadata: {

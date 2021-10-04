@@ -41,4 +41,11 @@ describe("transaction counter", () => {
       [txHash+120, txHash+140, txHash+160, txHash+170]
     )
   })
+  it("should clear array on reset", async () => {
+    const count = txCounter.increment(address, borrowEvent, txHash, 100)
+    expect(count).toStrictEqual(1)
+
+    txCounter.reset(address, borrowEvent)
+    expect(txCounter.getTransactions(address, borrowEvent)).toStrictEqual([])
+  })
 })

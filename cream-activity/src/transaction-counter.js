@@ -55,4 +55,8 @@ module.exports = class TransactionCounter {
       ? this.transactionMap[event][from].map((t) => t.txHash)
       : []
   }
+
+  reset(from, event) {
+    this.transactionMap[event][from] = []
+  }
 }

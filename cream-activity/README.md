@@ -23,12 +23,3 @@ Describe each of the type of alerts fired by this agent
 ## Test Data
 
 None
-
-## TODO
-
- - Change alertId/name/description
- - severity?
- - metadata?
- - more unit tests?
- - mainnet test?
- - more tx counter tests?
