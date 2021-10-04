@@ -19,13 +19,13 @@ function provideHandleTransaction(txCounter) {
         const count = txCounter.increment(from, eventSig, txHash, blockTimestamp)
         
         if (count === countThreshold) {
-          findings.push(createAlert(from, eventSig, count))
+          findings.push(createAlert(from, eventSig))
           txCounter.reset(from, eventSig)
         }
       })
     })
 
-    function createAlert(from, eventSig, count) {
+    function createAlert(from, eventSig) {
       return Finding.fromObject({
         name: "High Transaction Activity",
         description: `${from} did ${getEventName(eventSig)} 5 times in the last minute`,
