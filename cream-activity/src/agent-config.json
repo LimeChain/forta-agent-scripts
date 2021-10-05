@@ -1,0 +1,9 @@
+{
+    "contractAddress": "0xd06527d5e56a3495252a528c4987003b712860ee",
+    "eventSigs": [
+        "Borrow(address,uint256,uint256,uint256)",
+        "Mint(address,uint256,uint256)",
+        "Redeem(address,uint256,uint256)"
+    ],
+    "countThreshold": 5
+}
