@@ -22,4 +22,8 @@ Describe each of the type of alerts fired by this agent
 
 ## Test Data
 
-None
+You need to change the `countThreshold` value to 2 in the `agent-config.json` for testing.
+The agent behaviour can be verified with the following block:
+
+ - 13086312 (2 Mints from 
+0x923f3eda48731eb31e9da2ea316554bfad1404f0)

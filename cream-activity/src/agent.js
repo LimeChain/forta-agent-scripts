@@ -17,18 +17,18 @@ function provideHandleTransaction(txCounter) {
 
       eventLog.forEach(() => {
         const count = txCounter.increment(from, eventSig, txHash, blockTimestamp)
-        
+
         if (count === countThreshold) {
-          findings.push(createAlert(from, eventSig))
+          findings.push(createAlert(from, eventSig, count))
           txCounter.reset(from, eventSig)
         }
       })
     })
 
-    function createAlert(from, eventSig) {
+    function createAlert(from, eventSig, count) {
       return Finding.fromObject({
         name: "High Transaction Activity",
-        description: `${from} did ${getEventName(eventSig)} 5 times in the last minute`,
+        description: `${from} did ${getEventName(eventSig)} ${count} times in the last minute`,
         alertId: "cream-v1-eth-activity",
         severity: FindingSeverity.Medium,
         type: FindingType.Suspicious,
