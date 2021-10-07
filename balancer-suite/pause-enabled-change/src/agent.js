@@ -1,0 +1,66 @@
+const { Finding, FindingType, FindingSeverity, getJsonRpcUrl } = require("forta-agent")
+const { ethers } = require("ethers")
+
+const provider = new ethers.providers.JsonRpcProvider(getJsonRpcUrl())
+
+const VAULT_ADDRESS = "0xba12222222228d8ba445958a75a0704d566bf2c8"
+const EVENT_SIGNATURE = "SwapEnabledSet(bool)"
+
+const POOL_ABI = [
+  "function getVault() view returns (address)"
+]
+
+function provideHandleTransaction(createContract) {
+  return async function handleTransaction(txEvent) {
+    const findings = []
+    const eventLog = txEvent.filterEvent(EVENT_SIGNATURE)
+
+    for (const e of eventLog) {
+      const contract = createContract(e.address)
+
+      try {
+        const vault = await contract.getVault()
+
+        // Ensure the contract's vault is the Balancer V2 vault
+        if (vault.toLowerCase() === VAULT_ADDRESS) {
+          findings.push(createAlert(e.address, decodeData(e.data)))
+        }
+      } catch(e) {
+        // If the contract doesn't have getVault() function
+        // we should skip it
+        continue
+      }
+    }
+
+    function createAlert(address, state) {
+      stateString = state ? "enabled" : "disabled"
+
+      return Finding.fromObject({
+        name: "Balancer Pool Swap Enabled Changed",
+        description: `Swaps for pool ${address} are ${stateString}`,
+        alertId: "BALANCER-SWAP-ENABLED-CHANGED",
+        severity: FindingSeverity.Medium,
+        type: FindingType.Suspicious,
+        metadata: {
+          address,
+          swapEnabled: state,
+        },
+      })
+    }
+
+    return findings
+  }
+}
+
+const decodeData = (data) => {
+  return ethers.utils.defaultAbiCoder.decode(["bool paused"], data).paused
+}
+
+const createContract = (address) => {
+  return new ethers.Contract(address, POOL_ABI, provider)
+}
+
+module.exports = {
+  provideHandleTransaction,
+  handleTransaction: provideHandleTransaction(createContract),
+}
