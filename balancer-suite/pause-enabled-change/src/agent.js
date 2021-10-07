@@ -21,7 +21,7 @@ function provideHandleTransaction(createContract) {
       try {
         const vault = await contract.getVault()
 
-        // Ensure the contract's vault is the Balancer V2 vault
+        // Ensure the contract's vault is the same as the Balancer V2 Vault
         if (vault.toLowerCase() === VAULT_ADDRESS) {
           findings.push(createAlert(e.address, decodeData(e.data)))
         }
@@ -53,7 +53,7 @@ function provideHandleTransaction(createContract) {
 }
 
 const decodeData = (data) => {
-  return ethers.utils.defaultAbiCoder.decode(["bool paused"], data).paused
+  return ethers.utils.defaultAbiCoder.decode(["bool swapEnabled"], data).swapEnabled
 }
 
 const createContract = (address) => {

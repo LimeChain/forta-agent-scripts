@@ -13,12 +13,12 @@ const eventTopic = "0x5a9e84f78f7957cb4ed7478eb0fcad35ee4ecbe2e0f298420b28a39553
 const dataTrue = "0x0000000000000000000000000000000000000000000000000000000000000001"
 const dataFalse = "0x0000000000000000000000000000000000000000000000000000000000000000"
 
-const logsMatchEventPaused = {
+const logsMatchEventEnabled = {
   address: poolAddress,
   topics: [ eventTopic ],
   data: dataTrue
 }
-const logsMatchEventUnpaused = {
+const logsMatchEventDisabled = {
   address: poolAddress,
   topics: [ eventTopic ],
   data: dataFalse
@@ -61,7 +61,7 @@ describe("pause state change agent", () => {
 
     it("returns a finding on SwapEnabledSet event with state 'true'", async () => {
       const txEvent = createTxEvent({
-        logs: [logsMatchEventPaused],
+        logs: [logsMatchEventEnabled],
         addresses: { [poolAddress]: true, [vaultAddress]: true }
       })
 
@@ -84,7 +84,7 @@ describe("pause state change agent", () => {
     })
     it("returns a finding on SwapEnabledSet event with state 'false'", async () => {
       const txEvent = createTxEvent({
-        logs: [logsMatchEventUnpaused],
+        logs: [logsMatchEventDisabled],
         addresses: { [poolAddress]: true, [vaultAddress]: true }
       })
 
