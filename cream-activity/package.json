@@ -1,5 +1,5 @@
 {
-  "name": "forta-agent-starter",
+  "name": "cream-activity-agent",
   "version": "0.0.1",
   "description": "Forta Agent Javascript starter project",
   "scripts": {
@@ -14,7 +14,7 @@
     "test": "jest"
   },
   "dependencies": {
-    "forta-agent": "^0.0.18"
+    "forta-agent": "^0.0.22"
   },
   "devDependencies": {
     "jest": "^27.0.6",

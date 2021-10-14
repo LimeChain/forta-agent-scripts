@@ -2,7 +2,14 @@
 
 ## Description
 
-This agent detects when an address does high volume of interactions (borrow, mint, redeem) with the crETH token in 1 minute.
+This agent detects when an address does high volume of interactions (borrow, mint, redeem) with the crETH token in 1 hour.
+
+## Deployment
+
+- Set unique name and version in the `package.json`
+- Set `ipfsGatewayUrl`, `ipfsGatewayAuth` and `agentRegistryJsonRpcUrl` in the `forta.config.json`
+- ```npm run publish```
+- For more information check the [Forta docs](https://docs.forta.network/en/latest/deploying/)
 
 ## Supported Chains
 
@@ -13,7 +20,7 @@ This agent detects when an address does high volume of interactions (borrow, min
 Describe each of the type of alerts fired by this agent
 
 - cream-v1-eth-activity
-  - Fired when an address does an action (Borrow, Mint or Redeem) 5 times in a minute
+  - Fired when an address does an action (Borrow, Mint or Redeem) 5 times in an hour
   - Severity is always set to "medium"
   - Type is always set to "suspicious"
   - Metadata fields:

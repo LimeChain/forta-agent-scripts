@@ -2,8 +2,8 @@ const { Finding, FindingType, FindingSeverity } = require("forta-agent")
 const { contractAddress, eventSigs, countThreshold } = require("./agent-config.json")
 const TransactionCounter = require("./transaction-counter")
 
-// Count only transactions in the last 60 seconds
-const txCounter = new TransactionCounter(60)
+// Count only transactions in the last 60 * 60 seconds (1 hour)
+const txCounter = new TransactionCounter(60 * 60)
 
 function provideHandleTransaction(txCounter) {
   return async function handleTransaction(txEvent) {
