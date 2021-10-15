@@ -1,5 +1,5 @@
 module.exports = {
-    // Current unknown roles used on mainner:
+    // Current unknown roles used on mainnet:
     // 0xb5593fe09464f360ecf835d5b9319ce69900ae1b29d13844b73c250b1f5f92fb
     // 0x78ad1b68d148c070372f8643c4648efbb63c6a8a338f3c24714868e791367653
     // 0xc149e88b59429ded7f601ab52ecd62331cac006ae07c16543439ed138dcb8d34
