@@ -1,4 +1,4 @@
-# Balancer Pool Paused State Changed
+# Balancer LBP Swap Enabled Agent
 
 ## Description
 
@@ -16,7 +16,7 @@ This agent detects when the swapping for a Balancer Liquidity Bootstrap Pool has
   - Type is always set to "suspicious"
   - Metadata fields:
     - "address" - the pool's address
-    - "swapEnabled" - is the swap functionality enabled
+    - "swapEnabled" - 'true' if swap is enabled; 'false' if swap is disabled
 
 ## Test Data
 

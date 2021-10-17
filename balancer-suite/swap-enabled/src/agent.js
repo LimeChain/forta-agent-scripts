@@ -23,7 +23,7 @@ function provideHandleTransaction(createContract) {
 
         // Ensure the contract's vault is the same as the Balancer V2 Vault
         if (vault.toLowerCase() === VAULT_ADDRESS) {
-          findings.push(createAlert(e.address, decodeData(e.data)))
+          findings.push(createAlert(e.address, decodeData(e.data), txEvent.from))
         }
       } catch(e) {
         // If the contract doesn't have getVault() function
@@ -32,18 +32,20 @@ function provideHandleTransaction(createContract) {
       }
     }
 
-    function createAlert(address, state) {
+    function createAlert(address, state, from) {
       stateString = state ? "enabled" : "disabled"
 
       return Finding.fromObject({
         name: "Balancer Pool Swap Enabled Changed",
         description: `Swaps for pool ${address} are ${stateString}`,
         alertId: "BALANCER-SWAP-ENABLED-CHANGED",
+        protocol: "balancer",
         severity: FindingSeverity.Medium,
         type: FindingType.Suspicious,
         metadata: {
           address,
           swapEnabled: state,
+          from
         },
       })
     }
