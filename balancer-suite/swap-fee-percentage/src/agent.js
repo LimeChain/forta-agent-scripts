@@ -54,10 +54,11 @@ function createAlert(name, address, fee) {
 }
 
 const decodeData = (data) => {
-  const min = ethers.BigNumber.from("1000000000000") // 1e12 is the min fee (0.0001%)
   const number = ethers.utils.defaultAbiCoder.decode(["uint256 swapFeePercentage"], data).swapFeePercentage
 
-  return number.div(min).toNumber() / 10_000 // gets the fee in percentages
+  // 1e18 corresponds to 1.0 or 100% fee
+  // we use 16 decimals to get the fee in percentages
+  return ethers.utils.formatUnits(number, 16)
 }
 
 const createContract = (address) => {
