@@ -1,0 +1,18 @@
+{
+  "pools": [
+    {
+      "name": "B_50WBTC_50WETH",
+      "address": "0xA6F548DF93de924d73be7D25dC02554c6bD66dB5"
+    },
+    {
+      "name": "B-80BAL-20WETH",
+      "address": "0x5c6Ee304399DBdB9C8Ef030aB642B10820DB8F56"
+    },
+    {
+      "name": "B-60WETH-40DAI",
+      "address": "0x0b09deA16768f0799065C475bE02919503cB2a35"
+    }
+  ],
+  "window": 7200,
+  "maxPercentDiff": 2
+}
