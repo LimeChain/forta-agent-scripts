@@ -1,5 +1,6 @@
 const { Finding, FindingType, FindingSeverity, getJsonRpcUrl } = require("forta-agent")
 const { ethers } = require("ethers")
+const { percentageDifferenceThreshold } = require("./agent-config.json")
 
 const provider = new ethers.providers.JsonRpcProvider(getJsonRpcUrl())
 
@@ -7,10 +8,8 @@ const VAULT_ADDRESS = "0xba12222222228d8ba445958a75a0704d566bf2c8"
 const EVENT_SIGNATURE = "PoolBalanceChanged(bytes32,address,address[],int256[],uint256[])"
 
 const ABI = [
-  "function getPoolTokens(bytes32) view returns (address[], uint256[])" // Third param???
+  "function getPoolTokens(bytes32) view returns (address[], uint256[], uint256)"
 ]
-
-const PERCENTAGE_DIFFERENCE_THRESHOLD = 10
 
 let vaultContract
 
@@ -42,7 +41,7 @@ async function handleTransaction(txEvent) {
       }
 
       const percentage = calculatePercentage(balance, delta)
-      if (percentage >= PERCENTAGE_DIFFERENCE_THRESHOLD) {
+      if (percentage >= percentageDifferenceThreshold) {
         findings.push(createAlert(poolId, token, percentage, liquidityProvider))
       }
     }
