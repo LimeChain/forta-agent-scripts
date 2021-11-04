@@ -5,7 +5,8 @@ const { percentageDifferenceThreshold } = require("./agent-config.json")
 const provider = new ethers.providers.JsonRpcProvider(getJsonRpcUrl())
 
 const VAULT_ADDRESS = "0xba12222222228d8ba445958a75a0704d566bf2c8"
-const EVENT_SIGNATURE = "PoolBalanceChanged(bytes32,address,address[],int256[],uint256[])"
+
+const EVENT = "event PoolBalanceChanged(bytes32 indexed poolId, address indexed liquidityProvider, address[] tokens, int256[] deltas, uint256[] protocolFeeAmounts)"
 
 const ABI = [
   "function getPoolTokens(bytes32) view returns (address[], uint256[], uint256)"
@@ -21,12 +22,10 @@ function provideHandleInitialize(createContract) {
 
 async function handleTransaction(txEvent) {
   const findings = []
-  const eventLog = txEvent.filterEvent(EVENT_SIGNATURE, VAULT_ADDRESS)
+  const eventLog = txEvent.filterLog(EVENT, VAULT_ADDRESS)
 
   for (const e of eventLog) {
-    const poolId = e.topics[1]
-    const liquidityProvider = e.topics[2]
-    const { tokens, deltas } = decodeData(e.data)
+    const { poolId, liquidityProvider, tokens, deltas } = e.args
 
     const poolTokens = await vaultContract.getPoolTokens(poolId)
 
@@ -73,11 +72,6 @@ const calculatePercentage = (balance, delta) => {
   const deltaNum = ethers.utils.formatEther(delta)
   console.log("balance and delta", balanceNum, deltaNum)
   return (Math.abs(deltaNum/balanceNum) * 100).toFixed(2)
-}
-
-const decodeData = (data) => {
-  return ethers.utils.defaultAbiCoder.decode([
-    "address[] tokens", "uint256[] deltas", "uint256[] protocolFeeAmounts"], data)
 }
 
 const createContract = (address) => {

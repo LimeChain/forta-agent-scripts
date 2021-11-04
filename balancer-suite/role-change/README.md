@@ -18,7 +18,7 @@ This agent detects when the Balancer Authorizer grants or revokes role for addre
     - "role" - the role's hash
     - "account" - the account for which the role has been granted/revoked
     - "isGranted" - true if the role is granted; false if the role is revoked 
-    - "from" - the address which initiated the role change
+    - "sender" - the address which initiated the role change
 
 ## Test Data
 

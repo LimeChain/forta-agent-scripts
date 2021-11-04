@@ -4,7 +4,7 @@ const { ethers } = require("ethers")
 const provider = new ethers.providers.JsonRpcProvider(getJsonRpcUrl())
 
 const VAULT_ADDRESS = "0xba12222222228d8ba445958a75a0704d566bf2c8"
-const EVENT_SIGNATURE = "SwapFeePercentageChanged(uint256)"
+const EVENT = "event SwapFeePercentageChanged(uint256 swapFeePercentage)"
 
 const POOL_ABI = [
   "function getVault() view returns (address)",
@@ -14,8 +14,10 @@ const POOL_ABI = [
 function provideHandleTransaction(createContract) {
   return async function handleTransaction(txEvent) {
     const findings = []
-    const eventLog = txEvent.filterEvent(EVENT_SIGNATURE)
+    const eventLog = txEvent.filterLog(EVENT)
 
+    console.log(111, txEvent.receipt.logs)
+    console.log(222, eventLog)
     for (const e of eventLog) {
       const contract = createContract(e.address)
 

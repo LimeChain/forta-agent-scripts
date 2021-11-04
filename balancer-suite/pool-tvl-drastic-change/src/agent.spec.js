@@ -10,7 +10,8 @@ const { provideHandleInitialize, handleTransaction } = require("./agent")
 
 const vaultAddress = "0xBA12222222228d8Ba445958a75a0704d566BF2C8"
 const poolId = "0x01abc00e86c7e258823b9a055fd62ca6cf61a16300010000000000000000003b"
-const fromAddress = "0xffff"
+const fromAddress = "0x3709eA03772585AA799eecb095102A7fe1514FAe"
+const fromAddressEncoded = "0x0000000000000000000000003709ea03772585aa799eecb095102a7fe1514fae"
 const eventTopic = "0xe5ce249087ce04f05a957192435400fd97868dba0e6a4b4c049abf8af80dae78"
 
 const token = "0x0bc529c00C6401aEF6D220BE8C6Ea1667F6Ad93e"
@@ -22,7 +23,7 @@ const data = ethers.utils.defaultAbiCoder.encode([
 
 const logsMatchEvent = {
   address: vaultAddress,
-  topics: [ eventTopic, poolId, fromAddress ],
+  topics: [ eventTopic, poolId, fromAddressEncoded ],
   data: data
 }
 const logsNoMatchEvent = {
