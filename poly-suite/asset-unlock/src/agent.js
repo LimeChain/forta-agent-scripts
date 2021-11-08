@@ -17,7 +17,7 @@ function provideHandleTransaction(getPolyStorageValues) {
     const unlockEvents = txEvent.filterLog(UNLOCK_EVENT_SIGNATURE, LOCK_PROXY_ADDRESS)
 
     // We use the index to get the correct VerifyHeaderAndExecuteTxEvent
-    for ([i, unlockEvent] of unlockEvents.entries()) {
+    for (const [i, unlockEvent] of unlockEvents.entries()) {
       const { toAssetHash, toAddress, amount } = unlockEvent.args
 
       const verifyHeaderEvent = txEvent.filterLog(VERIFY_HEADER_EVENT_SIGNATURE, ECCM_ADDRESS)[i]
