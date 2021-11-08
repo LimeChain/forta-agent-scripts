@@ -67,7 +67,7 @@ describe("asset unlock agent", () => {
   })
 
   describe("handleTransaction", () => {
-    it("returns empty findings if no SwapEnabledSet event", async () => {
+    it("returns empty findings if no UnlockEvent event", async () => {
       const txEvent = createTxEvent({
         logs: [logsNoMatchEvent],
         addresses: { [lockProxyAddress]: true },
@@ -78,7 +78,7 @@ describe("asset unlock agent", () => {
       expect(findings).toStrictEqual([])
     })
 
-    it("returns a finding on SwapEnabledSet event with state 'true'", async () => {
+    it("returns a finding on UnlockEvent event", async () => {
       const txEvent = createTxEvent({
         logs: [logsMatchUnlockEvent, logsMatchVerifyHeaderEvent],
         addresses: { [lockProxyAddress]: true, [eccmAddress]: true },
