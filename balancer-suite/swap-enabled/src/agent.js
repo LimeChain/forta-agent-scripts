@@ -4,7 +4,7 @@ const { ethers } = require("ethers")
 const provider = new ethers.providers.JsonRpcProvider(getJsonRpcUrl())
 
 const VAULT_ADDRESS = "0xba12222222228d8ba445958a75a0704d566bf2c8"
-const EVENT_SIGNATURE = "SwapEnabledSet(bool)"
+const EVENT = "event SwapEnabledSet(bool swapEnabled)"
 
 const POOL_ABI = [
   "function getVault() view returns (address)"
@@ -13,17 +13,18 @@ const POOL_ABI = [
 function provideHandleTransaction(createContract) {
   return async function handleTransaction(txEvent) {
     const findings = []
-    const eventLog = txEvent.filterEvent(EVENT_SIGNATURE)
+    const eventLog = txEvent.filterLog(EVENT)
 
     for (const e of eventLog) {
       const contract = createContract(e.address)
+      const { swapEnabled } = e.args
 
       try {
         const vault = await contract.getVault()
 
         // Ensure the contract's vault is the same as the Balancer V2 Vault
         if (vault.toLowerCase() === VAULT_ADDRESS) {
-          findings.push(createAlert(e.address, decodeData(e.data), txEvent.from))
+          findings.push(createAlert(e.address, swapEnabled, txEvent.from))
         }
       } catch(e) {
         // If the contract doesn't have getVault() function
@@ -52,10 +53,6 @@ function provideHandleTransaction(createContract) {
 
     return findings
   }
-}
-
-const decodeData = (data) => {
-  return ethers.utils.defaultAbiCoder.decode(["bool swapEnabled"], data).swapEnabled
 }
 
 const createContract = (address) => {

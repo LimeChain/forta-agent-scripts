@@ -69,7 +69,6 @@ describe("high volume agent", () => {
         addresses: { [contractAddress]: true }
       })
 
-      mockTxCounter.increment.mockReset()
       mockTxCounter.increment.mockReturnValueOnce(5)
       const transactions = [
         { txHash: txEvent.hash, timestamp: txEvent.timestamp },

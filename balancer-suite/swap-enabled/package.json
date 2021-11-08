@@ -10,12 +10,12 @@
     "block": "forta-agent run --block",
     "range": "forta-agent run --range",
     "file": "forta-agent run --file",
+    "push": "forta-agent push",
     "publish": "forta-agent publish",
     "test": "jest"
   },
   "dependencies": {
-    "ethers": "^5.4.7",
-    "forta-agent": "^0.0.22"
+    "forta-agent": "^0.0.29"
   },
   "devDependencies": {
     "jest": "^27.0.6",

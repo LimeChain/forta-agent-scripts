@@ -4,7 +4,7 @@ const { ethers } = require("ethers")
 const provider = new ethers.providers.JsonRpcProvider(getJsonRpcUrl())
 
 const VAULT_ADDRESS = "0xba12222222228d8ba445958a75a0704d566bf2c8"
-const EVENT_SIGNATURE = "TokensRegistered(bytes32,address[],address[])"
+const EVENT = "event TokensRegistered(bytes32 indexed poolId, address[] tokens, address[] assetManagers)"
 
 const VAULT_ABI = [
   "function getPool(bytes32) view returns (address, uint8)"
@@ -25,17 +25,15 @@ function provideHandleInitialize(createContract) {
 function provideHandleTransaction(createContract) {
   return async function handleTransaction(txEvent) {
     const findings = []
-    const eventLog = txEvent.filterEvent(EVENT_SIGNATURE, VAULT_ADDRESS)
+    const eventLog = txEvent.filterLog(EVENT, VAULT_ADDRESS)
 
     for (const e of eventLog) {
-      const poolId = e.topics[1]
-      const poolAddress = (await vaultContract.getPool(poolId))[0]
+      const { poolId, tokens, assetManagers } = e.args
 
+      const poolAddress = (await vaultContract.getPool(poolId))[0]
       const poolContract = createContract(poolAddress)
       const poolName = await poolContract.name()
       
-      const { tokens, assetManagers } = decodeData(e.data)
-
       const tokenNames = []
       for (const token of tokens) {
         const tokenContract = createContract(token)
@@ -62,10 +60,6 @@ function provideHandleTransaction(createContract) {
 
     return findings
   }
-}
-
-const decodeData = (data) => {
-  return ethers.utils.defaultAbiCoder.decode(["address[] tokens", "address[] assetManagers"], data)
 }
 
 const createContract = (address) => {

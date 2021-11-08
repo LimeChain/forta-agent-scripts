@@ -1,7 +1,7 @@
 {
   "name": "cream-activity-agent",
   "version": "0.0.1",
-  "description": "Forta Agent Javascript starter project",
+  "description": "Cream Activity Agent",
   "scripts": {
     "start": "npm run start:dev",
     "start:dev": "nodemon --watch src --watch forta.config.json -e js,json --exec 'forta-agent run'",
@@ -11,10 +11,13 @@
     "range": "forta-agent run --range",
     "file": "forta-agent run --file",
     "publish": "forta-agent publish",
+    "push": "forta-agent push",
+    "disable": "forta-agent disable",
+    "enable": "forta-agent enable",
     "test": "jest"
   },
   "dependencies": {
-    "forta-agent": "^0.0.22"
+    "forta-agent": "^0.0.25"
   },
   "devDependencies": {
     "jest": "^27.0.6",
