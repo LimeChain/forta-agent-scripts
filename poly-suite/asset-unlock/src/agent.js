@@ -14,35 +14,35 @@ const VERIFY_HEADER_EVENT_SIGNATURE = "event VerifyHeaderAndExecuteTxEvent(uint6
 function provideHandleTransaction(getPolyStorageValues) {
   return async function handleTransaction(txEvent) {
     const findings = []
+    const unlockEvents = txEvent.filterLog(UNLOCK_EVENT_SIGNATURE, LOCK_PROXY_ADDRESS)
 
-    // We only verify the first UnlockEvent in a tx
-    const unlockEvent = txEvent.filterLog(UNLOCK_EVENT_SIGNATURE, LOCK_PROXY_ADDRESS)[0]
-    if (!unlockEvent) return findings
+    // We use the index to get the correct VerifyHeaderAndExecuteTxEvent
+    for ([i, unlockEvent] of unlockEvents.entries()) {
+      const { toAssetHash, toAddress, amount } = unlockEvent.args
 
-    const { toAssetHash, toAddress, amount } = unlockEvent.args
-
-    const verifyHeaderEvent = txEvent.filterLog(VERIFY_HEADER_EVENT_SIGNATURE, ECCM_ADDRESS)[0]
-    const { crossChainTxHash } = verifyHeaderEvent.args
-
-    const { polyAsset, polyAddress, polyAmount } = await getPolyStorageValues(crossChainTxHash)
-
-    if (
-      toAssetHash.toLowerCase() !== polyAsset ||
-      toAddress.toLowerCase() !== polyAddress ||
-      !amount.eq(polyAmount)
-      ) {
-      findings.push(Finding.fromObject({
-        name: "Poly UnlockEvent With Wrong Parameters",
-        description: `The parameters of the UnlockEvent and the poly storage are different`,
-        alertId: "POLY-ASSET-UNLOCK-WRONG-PARAMS",
-        protocol: "poly",
-        severity: FindingSeverity.Critical,
-        type: FindingType.Exploit,
-        metadata: {
-          unlockEventParams: { toAssetHash, toAddress, amount },
-          polyStorageParams: { polyAsset, polyAddress, polyAmount },
-        },
-      }))
+      const verifyHeaderEvent = txEvent.filterLog(VERIFY_HEADER_EVENT_SIGNATURE, ECCM_ADDRESS)[i]
+      const { crossChainTxHash } = verifyHeaderEvent.args
+  
+      const { polyAsset, polyAddress, polyAmount } = await getPolyStorageValues(crossChainTxHash)
+  
+      if (
+        toAssetHash.toLowerCase() !== polyAsset ||
+        toAddress.toLowerCase() !== polyAddress ||
+        !amount.eq(polyAmount)
+        ) {
+        findings.push(Finding.fromObject({
+          name: "Poly UnlockEvent With Wrong Parameters",
+          description: `The parameters of the UnlockEvent and the poly storage are different`,
+          alertId: "POLY-ASSET-UNLOCK-WRONG-PARAMS",
+          protocol: "poly",
+          severity: FindingSeverity.Critical,
+          type: FindingType.Exploit,
+          metadata: {
+            unlockEventParams: { toAssetHash, toAddress, amount },
+            polyStorageParams: { polyAsset, polyAddress, polyAmount },
+          },
+        }))
+      }
     }
     return findings
   }
