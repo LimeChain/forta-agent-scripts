@@ -16,10 +16,13 @@ function provideHandleTransaction(createContract) {
     const findings = []
     const eventLog = txEvent.filterLog(EVENT)
 
-    console.log(111, txEvent.receipt.logs)
-    console.log(222, eventLog)
     for (const e of eventLog) {
       const contract = createContract(e.address)
+      const { swapFeePercentage } = e.args
+
+      // 1e18 corresponds to 1.0 or 100% fee
+      // we use 16 decimals to get the fee in percentages
+      const percentageFee = ethers.utils.formatUnits(swapFeePercentage, 16)
 
       try {
         const vault = await contract.getVault()
@@ -27,7 +30,7 @@ function provideHandleTransaction(createContract) {
         // Ensure the contract's vault is the same as the Balancer V2 Vault
         if (vault.toLowerCase() === VAULT_ADDRESS) {
           const name = await contract.name()
-          findings.push(createAlert(name, e.address, e.data))
+          findings.push(createAlert(name, e.address, percentageFee))
         }
       } catch(e) {
         // If the contract doesn't have getVault() function
@@ -43,7 +46,7 @@ function provideHandleTransaction(createContract) {
 function createAlert(name, address, fee) {
   return Finding.fromObject({
     name: "Balancer Pool Swap Fee Percentage Changed",
-    description: `New swap fee for ${name}: ${decodeData(fee)}%`,
+    description: `New swap fee for ${name}: ${fee}%`,
     alertId: "BALANCER-SWAP-FEE-PERCENTAGE-CHANGED",
     protocol: "balancer",
     severity: FindingSeverity.Medium,
@@ -53,14 +56,6 @@ function createAlert(name, address, fee) {
       fee,
     },
   })
-}
-
-const decodeData = (data) => {
-  const number = ethers.utils.defaultAbiCoder.decode(["uint256 swapFeePercentage"], data).swapFeePercentage
-
-  // 1e18 corresponds to 1.0 or 100% fee
-  // we use 16 decimals to get the fee in percentages
-  return ethers.utils.formatUnits(number, 16)
 }
 
 const createContract = (address) => {

@@ -4,6 +4,7 @@ const {
   Finding,
   createTransactionEvent,
 } = require("forta-agent")
+const { ethers } = require("ethers")
 
 const { provideHandleTransaction } = require("./agent")
 
@@ -11,12 +12,17 @@ const vaultAddress = "0xBA12222222228d8Ba445958a75a0704d566BF2C8"
 const poolAddress = "0x1111"
 const poolName = "Balancer 50 WETH 50 USDT"
 const eventTopic = "0xa9ba3ffe0b6c366b81232caab38605a0699ad5398d6cce76f91ee809e322dafc"
-const fee33 = "0x000000000000000000000000000000000000000000000000000bb9551fc24000" // 0.33%
+
+// 1e18 corresponds to 1.0 or 100% fee
+// we use 16 decimals to get the fee in percentages
+const fee = ethers.utils.parseUnits("0.33", 16)
+
+const data = ethers.utils.defaultAbiCoder.encode(["uint256 swapFeePercentage"], [fee])
 
 const logsMatchEvent = {
   address: poolAddress,
   topics: [ eventTopic ],
-  data: fee33
+  data
 }
 const logsNoMatchEvent = {
   address: poolAddress,
@@ -75,7 +81,7 @@ describe("pause state change agent", () => {
           severity: FindingSeverity.Medium,
           metadata: {
             address: poolAddress,
-            fee: fee33,
+            fee: '0.33',
           },
         }),
       ])
