@@ -1,6 +1,5 @@
-const { Finding, FindingType, FindingSeverity } = require("forta-agent")
+const { Finding, FindingType, FindingSeverity, ethers } = require("forta-agent")
 const { RequestManager, HTTPTransport, Client } = require("@open-rpc/client-js")
-const { ethers } = require("ethers")
 
 const transport = new HTTPTransport("http://seed1.poly.network:20336")
 const client = new Client(new RequestManager([transport]))
@@ -26,8 +25,8 @@ function provideHandleTransaction(getPolyStorageValues) {
       const { polyAsset, polyAddress, polyAmount } = await getPolyStorageValues(crossChainTxHash)
   
       if (
-        toAssetHash.toLowerCase() !== polyAsset ||
-        toAddress.toLowerCase() !== polyAddress ||
+        toAssetHash.toLowerCase() !== polyAsset.toLowerCase() ||
+        toAddress.toLowerCase() !== polyAddress.toLowerCase() ||
         !amount.eq(polyAmount)
         ) {
         findings.push(Finding.fromObject({
