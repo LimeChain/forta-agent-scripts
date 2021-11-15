@@ -1,0 +1,12 @@
+module.exports = {
+  chains: {
+    '2': { // Ethereum
+      'ccdAddress': '0xcf2afe102057ba5c16f899271045a0a37fcb10f2',
+      'provider': '<JsonRpcProvider>'
+    },
+    '6': { // BSC
+      'ccdAddress': '0x11e2A718d46EBe97645b87F2363AFE1BF28c2672',
+      'provider': '<JsonRpcProvider>'
+    }
+  }
+}
