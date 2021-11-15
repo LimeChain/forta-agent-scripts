@@ -1,6 +1,5 @@
-const { Finding, FindingType, FindingSeverity } = require("forta-agent")
+const { Finding, FindingType, FindingSeverity, ethers } = require("forta-agent")
 const { RequestManager, HTTPTransport, Client } = require("@open-rpc/client-js")
-const { ethers } = require("ethers")
 const { chains } = require("./agent-config")
 
 const transport = new HTTPTransport("http://seed1.poly.network:20336")
