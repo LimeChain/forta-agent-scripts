@@ -86,6 +86,5 @@ function createAlert(token, lockedAmount, unlockedAmount) {
 module.exports = {
   provideHandleBlock,
   handleBlock: provideHandleBlock(config, contracts),
-  initialize,
-  contracts
+  initialize
 }
