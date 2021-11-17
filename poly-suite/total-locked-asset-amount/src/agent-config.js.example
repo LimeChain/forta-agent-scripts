@@ -1,0 +1,52 @@
+module.exports = {
+  chains: {
+    'eth': {
+      lockProxy: '0x250e76987d838a75310c34bf422ea9f1ac4cc906',
+      provider: '<JsonRpcProvider>'
+    },
+    'bsc': {
+      lockProxy: '0x2f7ac9436ba4b548f9582af91ca1ef02cd2f1f03',
+      provider: '<JsonRpcProvider>'
+    },
+    'heco': {
+      lockProxy: '0x020c15e7d08A8Ec7D35bCf3AC3CCbF0BBf2704e6',
+      provider: '<JsonRpcProvider>'
+    }
+  },
+  tokens: {
+    'fei': {
+      'sourceChain': 'eth',
+      'address': '0x956f47f50a910163d8bf957cf5846d573e7f87ca',
+      'destinationChains': {
+        'bsc': {
+          'address': '0xb096d364dbdf04f6230cd5d1aa5ee1c91fc7a819',
+          'initialBalance': '2500000000'
+        },
+        'heco': {
+          'address': '0x485cdbff08a4f91a16689e73893a11ae8b76af6d',
+          'initialBalance': '2500000000'
+        }
+      }
+    },
+    'pkr': {
+      'sourceChain': 'eth',
+      'address': '0x001a8ffcb0f03e99141652ebcdecdb0384e3bd6c',
+      'destinationChains': {
+        'bsc': {
+          'address': '0xc49dde62b4a0810074721faca54aab52369f486a',
+          'initialBalance': '1000000000'
+        },
+      }
+    },
+    'dmod': {
+      'sourceChain': 'eth',
+      'address': '0x5f6c5c2fb289db2228d159c69621215e354218d7',
+      'destinationChains': {
+        'bsc': {
+          'address': '0x002d8563759f5e1eaf8784181f3973288f6856e4',
+          'initialBalance': '15000000'
+        },
+      }
+    }
+  }
+}
