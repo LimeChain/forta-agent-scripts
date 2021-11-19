@@ -15,6 +15,7 @@ const config = {
     {
       'name': 'asd',
       'sourceChain': 'eth',
+      'decimals': 18,
       'destinationChains': [
         {
           'chain': 'bsc',

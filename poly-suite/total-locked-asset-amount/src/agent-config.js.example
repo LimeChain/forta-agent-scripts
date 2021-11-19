@@ -18,6 +18,7 @@ module.exports = {
       'name': 'fei',
       'sourceChain': 'eth',
       'address': '0x956f47f50a910163d8bf957cf5846d573e7f87ca',
+      'decimals': 18,
       'destinationChains': [
         {
           'chain': 'bsc',
@@ -35,6 +36,7 @@ module.exports = {
       'name': 'pkr',
       'sourceChain': 'eth',
       'address': '0x001a8ffcb0f03e99141652ebcdecdb0384e3bd6c',
+      'decimals': 18,
       'destinationChains': [
         {
           'chain': 'bsc',
@@ -47,6 +49,7 @@ module.exports = {
       'name': 'dmod',
       'sourceChain': 'eth',
       'address': '0x5f6c5c2fb289db2228d159c69621215e354218d7',
+      'decimals': 18,
       'destinationChains': [
         {
           'chain': 'bsc',

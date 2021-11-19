@@ -48,6 +48,7 @@ function provideHandleBlock(config, contracts) {
     }
   }
 
+// We pass the config and contracts so we can mock them
 async function runJob(config, contracts) {
   isChecking = true
 
@@ -61,9 +62,11 @@ async function runJob(config, contracts) {
 
 const getAlerts = (token, contracts, config) => new Promise(
   async (resolve) => {
-    const { name, sourceChain, destinationChains } = token
-    const lockedAmount = await contracts[name][sourceChain].balanceOf(config.chains[sourceChain].lockProxy)
-    const unlockedAmountPromises = destinationChains.map(dstChain => getUnlockedAmounts(dstChain, name, contracts, config))
+    const { name, decimals, sourceChain, destinationChains } = token
+    const lockedAmount = await contracts[name][sourceChain]
+      .balanceOf(config.chains[sourceChain].lockProxy)
+    const unlockedAmountPromises = destinationChains.map(dstChain => 
+      getUnlockedAmounts(dstChain, name, decimals, contracts, config))
 
     // Sum all unlocked amounts
     const totalUnlockedAmount = (await Promise.all(unlockedAmountPromises)).reduce((a,b) => {
@@ -78,12 +81,12 @@ const getAlerts = (token, contracts, config) => new Promise(
   }
 )
 
-const getUnlockedAmounts = (dstChain, name, contracts, config) => new Promise(
+const getUnlockedAmounts = (dstChain, name, decimals, contracts, config) => new Promise(
   async (resolve) => {
     const { chain, initialBalance } = dstChain
     const balance = await contracts[name][chain].balanceOf(config.chains[chain].lockProxy)
     // Calculate the difference between the initial deposited and the current balance
-    const diff = ethers.utils.parseUnits(initialBalance, 18).sub(balance)
+    const diff = ethers.utils.parseUnits(initialBalance, decimals).sub(balance)
     resolve(diff)
   }
 )
