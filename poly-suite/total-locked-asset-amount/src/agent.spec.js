@@ -11,17 +11,19 @@ const config = {
     'eth': { 'lockProxy': 'lll' },
     'bsc': { 'lockProxy': 'lll' }
   },
-  tokens: {
-    'asd': {
+  tokens: [
+    {
+      'name': 'asd',
       'sourceChain': 'eth',
-      'destinationChains': {
-        'bsc': {
+      'destinationChains': [
+        {
+          'chain': 'bsc',
           'address': 'aaa',
           'initialBalance': '1000'
         },
-      }
+      ]
     }
-  }
+  ]
 }
 
 const contractsMock = {
@@ -32,25 +34,26 @@ const contractsMock = {
 }
 
 const ethBalance = ethers.utils.parseUnits("100", 18)
-const bscBalance = ethers.utils.parseUnits("20", 18)
+const wrongBscBalance = ethers.utils.parseUnits("20", 18)
+const correctBscBalance = ethers.utils.parseUnits("900", 18)
 
-// The locked balance   = ethBalance    = 100
-// The unlocked balance = initial - bsc = 980
+// The locked balance         = ethBalance        = 100
+// The wrong unlocked balance = initial - wrong   = 980
 const initialBalance = ethers.utils.parseUnits("1000", 18)
-const unlockedBalance = initialBalance.sub(bscBalance)
+const wrongUnlockedBalance = initialBalance.sub(wrongBscBalance)
 
 describe("total locked asset amount agent", () => {
   describe("handleBlock", () => {
-    it("should returns a finding if locked and unlocked balances are different", async () => {
+    it("should return a finding if locked and unlocked balances are different", async () => {
 
       contractsMock['asd']['eth'].balanceOf.mockReturnValueOnce(ethBalance)
-      contractsMock['asd']['bsc'].balanceOf.mockReturnValueOnce(bscBalance)
+      contractsMock['asd']['bsc'].balanceOf.mockReturnValueOnce(wrongBscBalance)
 
       const handleBlock = provideHandleBlock(config, contractsMock)
 
-      // we wait 100 ms after the first call because we need time to update the alerts array
+      // we wait 10 ms after the first call because we need time to update the alerts array
       await handleBlock()
-      await jest.setTimeout(100)
+      await new Promise(resolve => setTimeout(resolve, 10))
       const findings = await handleBlock()
 
       expect(findings).toStrictEqual([
@@ -64,10 +67,27 @@ describe("total locked asset amount agent", () => {
           metadata: {
             token: 'asd',
             lockedAmount: ethBalance.toHexString(),
-            unlockedAmount: unlockedBalance.toHexString(),
+            unlockedAmount: wrongUnlockedBalance.toHexString(),
           },
         }),
       ])
+    })
+
+    it("should not return a finding if locked and unlocked balances are the same", async () => {
+
+      contractsMock['asd']['eth'].balanceOf.mockReturnValueOnce(ethBalance)
+      contractsMock['asd']['bsc'].balanceOf.mockReturnValueOnce(correctBscBalance)
+
+      const handleBlock = provideHandleBlock(config, contractsMock)
+
+      // we wait 10 ms after the first call because we need time to update the alerts array
+      await handleBlock()
+      await new Promise(resolve => setTimeout(resolve, 10))
+      const findings = await handleBlock()
+
+      // Locked balance = 100
+      // Unlocked balance = initial - correct = 100
+      expect(findings).toStrictEqual([])
     })
   })
 })

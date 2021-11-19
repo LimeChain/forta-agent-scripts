@@ -17,12 +17,14 @@ async function initialize() {
   }
 
   // Initialize the token contracts on each chain
-  for (const [token, { address, sourceChain, destinationChains }] of Object.entries(config.tokens)) {
-    contracts[token] = {}
-    contracts[token][sourceChain] = new ethers.Contract(address, ABI, providers[sourceChain])
+  for (const token of config.tokens) {
+    const { name, address, sourceChain, destinationChains } = token
+    contracts[name] = {}
+    contracts[name][sourceChain] = new ethers.Contract(address, ABI, providers[sourceChain])
 
-    for(const [chain, info] of Object.entries(destinationChains)) {
-      contracts[token][chain] = new ethers.Contract(info.address, ABI, providers[chain])
+    for(const dstChain of destinationChains) {
+      const { chain, address } = dstChain
+      contracts[name][chain] = new ethers.Contract(address, ABI, providers[chain])
     }
   }
 }
@@ -36,6 +38,8 @@ function provideHandleBlock(config, contracts) {
       alerts = []
     }
 
+    // Check amounts only if it is not checking at the moment
+    // and the last check was > 1 minute ago
     if (!isChecking && (now - lastCheck > MINUTE)) {
       runJob(config, contracts)
     }
@@ -46,26 +50,43 @@ function provideHandleBlock(config, contracts) {
 
 async function runJob(config, contracts) {
   isChecking = true
-  const tempAlerts = []
-  for (const [name, { sourceChain, destinationChains }] of Object.entries(config.tokens)) {
-    const lockedAmount = await contracts[name][sourceChain].balanceOf(config.chains[sourceChain].lockProxy)
-    let totalUnlockedAmount = ethers.BigNumber.from(0)
 
-    for(const [chain, info] of Object.entries(destinationChains)) {
-      const balance = await contracts[name][chain].balanceOf(config.chains[chain].lockProxy)
-      // Calculate the difference between the initial deposited and the current balance
-      const diff = ethers.utils.parseUnits(info.initialBalance, 18).sub(balance)
-      totalUnlockedAmount = totalUnlockedAmount.add(diff)
-    }
+  const tokenPromises = config.tokens.map(token => getAlerts(token, contracts, config))
 
-    if (lockedAmount.lt(totalUnlockedAmount)) {
-      tempAlerts.push(createAlert(name, lockedAmount, totalUnlockedAmount))
-    }
-  }
+  // Remove the null elements
+  alerts = (await Promise.all(tokenPromises)).filter(alert => !!alert)
   isChecking = false
-  alerts = tempAlerts
   lastCheck = Date.now()
 }
+
+const getAlerts = (token, contracts, config) => new Promise(
+  async (resolve) => {
+    const { name, sourceChain, destinationChains } = token
+    const lockedAmount = await contracts[name][sourceChain].balanceOf(config.chains[sourceChain].lockProxy)
+    const unlockedAmountPromises = destinationChains.map(dstChain => getUnlockedAmounts(dstChain, name, contracts, config))
+
+    // Sum all unlocked amounts
+    const totalUnlockedAmount = (await Promise.all(unlockedAmountPromises)).reduce((a,b) => {
+      return a.add(b)
+    }, ethers.BigNumber.from(0))
+
+    if (lockedAmount.lt(totalUnlockedAmount)) {
+      resolve(createAlert(name, lockedAmount, totalUnlockedAmount))
+    } else {
+      resolve(null)
+    }
+  }
+)
+
+const getUnlockedAmounts = (dstChain, name, contracts, config) => new Promise(
+  async (resolve) => {
+    const { chain, initialBalance } = dstChain
+    const balance = await contracts[name][chain].balanceOf(config.chains[chain].lockProxy)
+    // Calculate the difference between the initial deposited and the current balance
+    const diff = ethers.utils.parseUnits(initialBalance, 18).sub(balance)
+    resolve(diff)
+  }
+)
 
 function createAlert(token, lockedAmount, unlockedAmount) {
   return Finding.fromObject({
