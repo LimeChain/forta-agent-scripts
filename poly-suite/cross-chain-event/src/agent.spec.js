@@ -73,5 +73,21 @@ describe("cross chain event agent", () => {
         }),
       ])
     })
+    
+    it("shound not return a finding if the data is correct", async () => {
+      const initialize = provideInitialize(clientMock)
+      const handleBlock = provideHandleBlock(clientMock, contractsMock)
+
+      clientMock.request.mockReturnValueOnce(2) // getblockcount in initialize
+      clientMock.request.mockReturnValueOnce(3) // getblockcount in handleBlock
+      clientMock.request.mockReturnValueOnce(events) // getsmartcodeevent
+      clientMock.request.mockReturnValueOnce(storageData) // getstorage
+      contractsMock['2'].getEthTxHash.mockReturnValueOnce("0x8a55c5fb3fad711b6401c3bdf1874bfb322e60178895baa6c8ff4ae62bfc30ae")
+
+      await initialize()
+      const findings = await handleBlock()
+
+      expect(findings).toStrictEqual([])
+    })
   })
 })
