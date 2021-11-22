@@ -111,7 +111,6 @@ const getEventsByBlockHeight = (block, client, contracts) => new Promise(
           const crossChainTxIndex = ethers.BigNumber.from("0x" + rawData.substr(2, 64))
           const srcChainHash = await contract.getEthTxHash(crossChainTxIndex.toNumber())
 
-          console.log(block, storageHash, srcChainId)
           if (storageHash !== srcChainHash) {
             findings.push(createAlert(event, storageHash, srcChainHash))
           }
