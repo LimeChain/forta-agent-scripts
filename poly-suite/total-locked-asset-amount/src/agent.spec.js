@@ -7,6 +7,7 @@ const {
 const { provideHandleBlock } = require("./agent")
 
 const config = {
+  interval: 60 * 1000, // 1 minute
   chains: {
     'eth': { 'lockProxy': 'lll' },
     'bsc': { 'lockProxy': 'lll' }

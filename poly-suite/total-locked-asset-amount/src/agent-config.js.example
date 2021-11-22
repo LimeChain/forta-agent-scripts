@@ -1,4 +1,5 @@
 module.exports = {
+  interval: 60 * 1000, // 1 minute
   chains: {
     'eth': {
       lockProxy: '0x250e76987d838a75310c34bf422ea9f1ac4cc906',

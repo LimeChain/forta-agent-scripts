@@ -1,7 +1,6 @@
 const { Finding, FindingType, FindingSeverity, ethers } = require("forta-agent")
 const config = require('./agent-config')
 
-const MINUTE = 1000 * 60
 const ABI = [ "function balanceOf(address) public view returns (uint256)" ]
 
 let isChecking = false
@@ -40,7 +39,7 @@ function provideHandleBlock(config, contracts) {
 
     // Check amounts only if it is not checking at the moment
     // and the last check was > 1 minute ago
-    if (!isChecking && (now - lastCheck > MINUTE)) {
+    if (!isChecking && (now - lastCheck > config.interval)) {
       runJob(config, contracts)
     }
 
