@@ -59,8 +59,7 @@ async function runJob(config, contracts) {
   lastCheck = Date.now()
 }
 
-const getAlerts = (token, contracts, config) => new Promise(
-  async (resolve) => {
+const getAlerts = async (token, contracts, config) => {
     const { name, decimals, sourceChain, destinationChains } = token
     const lockedAmount = await contracts[name][sourceChain]
       .balanceOf(config.chains[sourceChain].lockProxy)
@@ -73,22 +72,17 @@ const getAlerts = (token, contracts, config) => new Promise(
     }, ethers.BigNumber.from(0))
 
     if (lockedAmount.lt(totalUnlockedAmount)) {
-      resolve(createAlert(name, lockedAmount, totalUnlockedAmount))
-    } else {
-      resolve(null)
+      return createAlert(name, lockedAmount, totalUnlockedAmount)
     }
   }
-)
 
-const getUnlockedAmounts = (dstChain, name, decimals, contracts, config) => new Promise(
-  async (resolve) => {
+const getUnlockedAmounts = async (dstChain, name, decimals, contracts, config) => {
     const { chain, initialBalance } = dstChain
     const balance = await contracts[name][chain].balanceOf(config.chains[chain].lockProxy)
     // Calculate the difference between the initial deposited and the current balance
     const diff = ethers.utils.parseUnits(initialBalance, decimals).sub(balance)
-    resolve(diff)
+    return diff
   }
-)
 
 function createAlert(token, lockedAmount, unlockedAmount) {
   return Finding.fromObject({
