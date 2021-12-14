@@ -26,13 +26,13 @@ describe("bad debt agent", () => {
   })
 
   describe("handleTransaction", () => {
-    it("returns empty findings if gas used is below threshold", async () => {
+    it("returns empty findings if there are not matching events", async () => {
       mockTxEvent.filterLog.mockReturnValue([])
       const findings = await handleTransaction(mockTxEvent);
       expect(findings).toStrictEqual([]);
     });
 
-    it("returns a finding if gas used is above threshold", async () => {
+    it("returns a finding if the account has shortfall", async () => {
       const mockMintEvent = {
         address: markets['cyWETH'],
         args: [ account ],
