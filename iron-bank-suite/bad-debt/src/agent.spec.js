@@ -50,7 +50,7 @@ describe("bad debt agent", () => {
       expect(findings).toStrictEqual([
         Finding.fromObject({
           name: "Account has bad debt",
-          description: `The account has bad debt after interacting with the Iron Bank`,
+          description: `Account has bad debt after interacting with the Iron Bank`,
           alertId: "IRON-BANK-BAD-DEBT",
           protocol: "iron-bank",
           severity: FindingSeverity.Medium,
