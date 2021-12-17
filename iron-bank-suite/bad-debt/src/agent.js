@@ -33,7 +33,8 @@ async function handleTransaction(txEvent) {
   })
 
   let promises = [...accounts].map(account => checkForBadDebt(account))
-  const findings = await Promise.all(promises)
+  const findings = (await Promise.all(promises)).filter(alert => !!alert) // Remove undefined elements
+  console.log(findings)
   return findings
 }
 
