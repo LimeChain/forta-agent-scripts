@@ -11,8 +11,12 @@ const tornadoCashAddresses = [
   '0xA160cdAB225685dA1d56aa342Ad8841c3b53f291', // 100 ETH
 ]
 
+// We cannot put the key in a config file
+// because it would be easy to extract it
+const apiKey = "test"
+
 // 5 per minute * 60 minutes * 24 hours => ~1 day
-const timeFrameBlocks = 5 * 60 * 24 
+const timeFrameBlocks = 5 * 60 * 24
 
 function provideHandleTransaction(getEtherscanResponse) {
   return async function handleTransaction(txEvent) {
@@ -56,7 +60,7 @@ const getEtherscanQuery = (txEvent) => {
   const startBlock = txEvent.blockNumber - timeFrameBlocks
   return `https://api.etherscan.io/api?module=account` +
     `&action=txlistinternal&address=${txEvent.from}&startblock=${startBlock}` +
-    `&endblock=latest&page=1&offset=100&sort=desc&apikey=YourApiKeyToken`
+    `&endblock=latest&page=1&offset=100&sort=desc&apikey=${apiKey}`
 }
 
 module.exports = {

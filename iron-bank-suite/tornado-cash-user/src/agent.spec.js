@@ -67,7 +67,6 @@ describe("tornado cash user agent", () => {
         blockNumber: 1000,
         addresses: { [markets['cyWETH']]: true }
       })
-      console.log(txEvent)
       const findings = await handleTransaction(txEvent)
 
       expect(findings).toStrictEqual([
