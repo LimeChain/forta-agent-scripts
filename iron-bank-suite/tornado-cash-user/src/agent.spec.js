@@ -6,7 +6,7 @@ const {
   createTransactionEvent
 } = require("forta-agent")
 const { provideHandleTransaction } = require("./agent")
-const { markets } = require("./iron-bank-markets")
+const { markets } = require("./agent-config")
 
 const account = '0xaccount'
 let handleTransaction
