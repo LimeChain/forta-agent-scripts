@@ -1,6 +1,6 @@
 const { Finding, FindingSeverity, FindingType } = require("forta-agent")
 const axios = require("axios")
-const { markets } = require("./iron-bank-markets")
+const { timeFrameBlocks, markets } = require("./agent-config")
 
 const marketsAddresses = Object.values(markets)
 
@@ -14,9 +14,6 @@ const tornadoCashAddresses = [
 // We cannot put the key in a config file
 // because it would be easy to extract it
 const apiKey = "test"
-
-// 5 per minute * 60 minutes * 24 hours => ~1 day
-const timeFrameBlocks = 5 * 60 * 24
 
 function provideHandleTransaction(getEtherscanResponse) {
   return async function handleTransaction(txEvent) {

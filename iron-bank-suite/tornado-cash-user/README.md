@@ -15,7 +15,7 @@ Detects if account interacting with Iron Bank market has withdrawn from Tornado.
   - Severity is always set to "medium"
   - Type is always set to "suspicious"
   - Metadata field:
-    - "account" - the account that has bad debt
+    - "account" - the account that has interacted with tornado.cash
     - "tornadoCashTxIds" - the Tornado.cash transaction of the account
 
 ## Test Data

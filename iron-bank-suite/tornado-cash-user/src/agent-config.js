@@ -1,4 +1,6 @@
 module.exports = {
+    // 5 per minute * 60 minutes * 24 hours => ~1 day
+    timeFrameBlocks = 5 * 60 * 24,
     markets: {
         'cyWETH': '0x41c84c0e2ee0b740cf0d31f63f3b6f627dc6b393',
         'cyDAI': '0x8e595470Ed749b85C6F7669de83EAe304C2ec68F',
