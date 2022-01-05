@@ -10,7 +10,7 @@ Detects if system related contracts or variables are changed
 
 ## Alerts
 
-- IRON-BANK-CREDIT-LIMIT-CHANGED
+- IRON-BANK-SYSTEM-RELATED-CHANGE
   - Fired when system related contracts or variables are changed
   - Severity is always set to "medium"
   - Type is always set to "info"
