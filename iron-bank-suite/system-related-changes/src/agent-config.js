@@ -39,7 +39,8 @@ module.exports = {
         "event NewBorrowCapGuardian(address oldBorrowCapGuardian, address newBorrowCapGuardian)",
         "event NewSupplyCap(address indexed cToken, uint256 newSupplyCap)",
         "event NewSupplyCapGuardian(address oldSupplyCapGuardian, address newSupplyCapGuardian)",
-        "event NewCTokenVersion(address cToken, uint8 oldVersion, uint8 newVersion)"
+        "event MarketListed(address cToken)",
+        "event MarketDelisted(CToken cToken)"
     ],
     marketEventSigs: [
         "event NewPendingAdmin(address oldPendingAdmin, address newPendingAdmin)",
