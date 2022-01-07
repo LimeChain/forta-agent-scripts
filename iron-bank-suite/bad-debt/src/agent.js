@@ -24,17 +24,15 @@ function provideInitialize(createContract) {
 async function handleTransaction(txEvent) {
   const accounts = new Set()
 
-  ironBankEventSigs.forEach(eventSig => {
-    txEvent.filterLog(eventSig)
-      // Check if the event is from Iron Bank address
-      .filter(e => marketsAddresses.includes(e.address))
-      .map(e => e.args[0]) // args[0] is always the initiating account
-      .forEach(e => accounts.add(e))
-  })
+  txEvent.filterLog(ironBankEventSigs)
+    // Check if the event is from Iron Bank address
+    .filter(e => marketsAddresses.includes(e.address))
+    .map(e => e.args[0]) // args[0] is always the initiating account
+    .forEach(e => accounts.add(e))
 
   let promises = [...accounts].map(account => checkForBadDebt(account))
   const findings = (await Promise.all(promises)).filter(alert => !!alert) // Remove undefined elements
-  console.log(findings)
+
   return findings
 }
 
@@ -52,7 +50,7 @@ checkForBadDebt = async (account) => {
       alertId: "IRON-BANK-BAD-DEBT",
       protocol: "iron-bank",
       severity: FindingSeverity.Medium,
-      type: FindingType.Degraded,
+      type: FindingType.Info,
       metadata: {
         account,
         shortfall: shortfall.toString(),

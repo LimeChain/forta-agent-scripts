@@ -57,7 +57,7 @@ const getEtherscanQuery = (txEvent) => {
   const startBlock = txEvent.blockNumber - timeFrameBlocks
   return `https://api.etherscan.io/api?module=account` +
     `&action=txlistinternal&address=${txEvent.from}&startblock=${startBlock}` +
-    `&endblock=latest&page=1&offset=100&sort=desc&apikey=${apiKey}`
+    `&endblock=latest&page=1&offset=1000&sort=desc&apikey=${apiKey}`
 }
 
 module.exports = {
