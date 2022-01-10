@@ -2,7 +2,9 @@
 
 ## Description
 
-Detects if there are nested borrows
+Detects if there are nested borrows.
+Tested with CREAM AMP exploit transaction which contains nested borrows.
+The addresses of the CREAM markets are changed to Iron Bank markets because we filter out all other addresses.
 
 ## Supported Chains
 
