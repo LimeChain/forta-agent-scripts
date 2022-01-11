@@ -54,7 +54,7 @@ describe("bad debt agent", () => {
           alertId: "IRON-BANK-BAD-DEBT",
           protocol: "iron-bank",
           severity: FindingSeverity.Medium,
-          type: FindingType.Degraded,
+          type: FindingType.Info,
           metadata: {
             account,
             shortfall: shortfall.toString(),
