@@ -26,6 +26,8 @@ function provideHandleTransaction(ethcallProvider, contract) {
 
     let accounts = 0
     data.forEach(e => {
+      // getAccountLiquidity returns (error, liquidity, shortfall)
+      // an account has liquidity in Iron Bank market if it has either liquidity or shortfall
       const [_, liquidity, shortfall] = e
       if (liquidity > zero || shortfall > zero) {
         accounts++
