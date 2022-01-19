@@ -39,6 +39,9 @@ describe("high-number-of-markets agent", () => {
           protocol: "iron-bank",
           severity: FindingSeverity.Medium,
           type: FindingType.Suspicious,
+          metadata: {
+            markets: Object.keys(addresses)
+          }
         }),
       ])
     })
