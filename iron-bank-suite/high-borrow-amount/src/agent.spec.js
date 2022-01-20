@@ -7,10 +7,6 @@ const {
 const { provideInitialize, handleTransaction } = require("./agent")
 const { markets } = require("./iron-bank-markets")
 
-// const address = "0xab1c342c7bf5ec5f02adea1c2270670bca144cbb"
-// const protocol = "0xprotocol"
-// const creditLimit = ethers.constants.One
-
 const address = markets["cyWETH"]
 const borrower = "0xsomeborrower"
 
