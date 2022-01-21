@@ -20,44 +20,14 @@ function provideInitialize(createContract) {
 }
 
 async function handleTransaction(txEvent) {
-  const findings = []
-
   // Get only borrow/mint events from Iron Bank markets
   const events = txEvent.filterLog(eventSigs)
     .filter(e => marketsAddresses.includes(e.address))
     
 
-  for(const event of events) {
-    const eventName = event.name
-    const address = event.address
-
-    // The first argument is the account (minter/borrower)
-    const account = event.args[0]
-
-    // The second argument is the amount
-    const amount = ethers.utils.formatEther(event.args[1])
-
-    // Get the price of the underlying asset in USD
-    const price = ethers.utils.formatEther(await oracleContract.getUnderlyingPrice(address))
-
-    const usdAmount = amount * price
-
-    if (usdAmount > AMOUNT_THRESHOLD) {
-      findings.push(Finding.fromObject({
-        name: `${eventName} with high amount`,
-        description: `Address ${account} ${eventName.toLowerCase()}ed $${usdAmount.toFixed(2)} from ${getAddressName(address)}`,
-        alertId: `IRON-BANK-HIGH-${eventName.toUpperCase()}-AMOUNT`,
-        protocol: "iron-bank",
-        severity: FindingSeverity.Medium,
-        type: FindingType.Info,
-        metadata: {
-          account,
-          amount: usdAmount,
-          market: address
-        },
-      }))
-    }
-  }
+  const promises = events.map(event => checkAmount(event))
+  const findings = (await Promise.all(promises))
+    .filter(alert => !!alert) // Remove undefined elements
 
   return findings
 }
@@ -69,6 +39,38 @@ createContract = () => {
 const getAddressName = (address) => {
   for (const [key, value] of Object.entries(markets)) {
     if (address === value) return key
+  }
+}
+
+const checkAmount = async (event) => {
+  const eventName = event.name
+  const address = event.address
+
+  // The first argument is the account (minter/borrower)
+  const account = event.args[0]
+
+  // The second argument is the amount
+  const amount = ethers.utils.formatEther(event.args[1])
+
+  // Get the price of the underlying asset in USD
+  const price = ethers.utils.formatEther(await oracleContract.getUnderlyingPrice(address))
+
+  const usdAmount = amount * price
+
+  if (usdAmount > AMOUNT_THRESHOLD) {
+    return new Finding.fromObject({
+      name: `${eventName} with high amount`,
+      description: `Address ${account} ${eventName.toLowerCase()}ed $${usdAmount.toFixed(2)} from ${getAddressName(address)}`,
+      alertId: `IRON-BANK-HIGH-${eventName.toUpperCase()}-AMOUNT`,
+      protocol: "iron-bank",
+      severity: FindingSeverity.Medium,
+      type: FindingType.Info,
+      metadata: {
+        account,
+        amount: usdAmount,
+        market: address
+      },
+    })
   }
 }
 
