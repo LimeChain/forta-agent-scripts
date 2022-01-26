@@ -18,6 +18,7 @@
     "test": "jest"
   },
   "dependencies": {
+    "ethers-multicall": "^0.2.2",
     "forta-agent": "^0.0.32"
   },
   "devDependencies": {

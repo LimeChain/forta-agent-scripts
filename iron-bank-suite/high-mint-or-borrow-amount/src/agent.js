@@ -1,5 +1,6 @@
 const { Finding, FindingSeverity, FindingType, ethers, getEthersProvider } = require("forta-agent")
 const { markets } = require("./iron-bank-markets")
+const { Contract, Provider } = require('ethers-multicall')
 
 const eventSigs = [
   "event Borrow(address borrower, uint256 borrowAmount, uint256 accountBorrows, uint256 totalBorrows)",
@@ -11,11 +12,12 @@ const abi = [ "function getUnderlyingPrice(address cToken) public view returns (
 const marketsAddresses = Object.values(markets)
 const AMOUNT_THRESHOLD = 5_000_000
 
-let oracleContract
+let ethcallProvider
+const oracleContract = new Contract(oracleAddress, abi)
 
-function provideInitialize(createContract) {
+function provideInitialize(createProvider) {
   return async function initialize() {
-    oracleContract = createContract()
+    ethcallProvider = createProvider()
   }
 }
 
@@ -24,25 +26,17 @@ async function handleTransaction(txEvent) {
   const events = txEvent.filterLog(eventSigs)
     .filter(e => marketsAddresses.includes(e.address))
     
+  // Use multicall contract to get all prices with only one call
+  const calls = events.map(e => oracleContract.getUnderlyingPrice(e.address))
+  const prices = await ethcallProvider.all(calls)
 
-  const promises = events.map(event => checkAmount(event))
-  const findings = (await Promise.all(promises))
+  const findings = events.map((event, i) => checkAmount(event, prices[i]))
     .filter(alert => !!alert) // Remove undefined elements
 
   return findings
 }
 
-createContract = () => {
-  return new ethers.Contract(oracleAddress, abi, getEthersProvider())
-}
-
-const getAddressName = (address) => {
-  for (const [key, value] of Object.entries(markets)) {
-    if (address === value) return key
-  }
-}
-
-const checkAmount = async (event) => {
+const checkAmount = (event, price) => {
   const eventName = event.name
   const address = event.address
 
@@ -52,10 +46,7 @@ const checkAmount = async (event) => {
   // The second argument is the amount
   const amount = ethers.utils.formatEther(event.args[1])
 
-  // Get the price of the underlying asset in USD
-  const price = ethers.utils.formatEther(await oracleContract.getUnderlyingPrice(address))
-
-  const usdAmount = amount * price
+  const usdAmount = amount * ethers.utils.formatEther(price)
 
   if (usdAmount > AMOUNT_THRESHOLD) {
     return new Finding.fromObject({
@@ -74,8 +65,18 @@ const checkAmount = async (event) => {
   }
 }
 
+createProvider = () => {
+  return new Provider(getEthersProvider(), 1)
+}
+
+const getAddressName = (address) => {
+  for (const [key, value] of Object.entries(markets)) {
+    if (address === value) return key
+  }
+}
+
 module.exports = {
   provideInitialize,
-  initialize: provideInitialize(createContract),
+  initialize: provideInitialize(createProvider),
   handleTransaction
 }
