@@ -17,18 +17,17 @@ const oraclePrice = ethers.utils.parseEther("5100")
 
 describe("high-borrow-amount agent", () => {
   const mockTxEvent = { filterLog: jest.fn() }
-  const mockContract = { getUnderlyingPrice: jest.fn() }
-  const mockCreateContract = () => mockContract
+  const mockProvider = { all: jest.fn() }
+  const mockCreateProvider = () => mockProvider
 
   beforeAll(async () => {
-    initialize = provideInitialize(mockCreateContract)
+    initialize = provideInitialize(mockCreateProvider)
     await initialize()
   })
 
   beforeEach(() => {
     mockTxEvent.filterLog.mockReset()
-    mockContract.getUnderlyingPrice.mockReset()
-    provideInitialize(mockCreateContract)
+    mockProvider.all.mockReset()
   })
 
   describe("handleTransaction", () => {
@@ -46,7 +45,7 @@ describe("high-borrow-amount agent", () => {
         args: [ account, amount ],
       }
       mockTxEvent.filterLog.mockReturnValueOnce([mockMintEvent])
-      mockContract.getUnderlyingPrice.mockReturnValueOnce(oraclePrice)
+      mockProvider.all.mockReturnValueOnce([oraclePrice])
       const findings = await handleTransaction(mockTxEvent)
 
       expect(findings).toStrictEqual([
@@ -73,7 +72,7 @@ describe("high-borrow-amount agent", () => {
         args: [ account, amount ],
       }
       mockTxEvent.filterLog.mockReturnValueOnce([mockMintEvent])
-      mockContract.getUnderlyingPrice.mockReturnValueOnce(oraclePrice)
+      mockProvider.all.mockReturnValueOnce([oraclePrice])
       const findings = await handleTransaction(mockTxEvent)
 
       expect(findings).toStrictEqual([
