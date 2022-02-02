@@ -1,8 +1,8 @@
-# High Number of Interactions by Account Agent
+# Drastic Price Change Agent
 
 ## Description
 
-Detects if an address interacts with Iron Bank markets a lot in a time interval
+Detects if the price of the underlying asset of an Iron Bank market changes drastically
 
 ## Supported Chains
 
@@ -10,10 +10,12 @@ Detects if an address interacts with Iron Bank markets a lot in a time interval
 
 ## Alerts
 
-- IRON-BANK-HIGH-NUMBER-OF-INTERACTIONS-BY-ADDRESS
-  - Fired when accounts interacts with Iron Bank more than `INTERACTION_THRESHOLD` times in a time interval
+- IRON-BANK-DRASTIC-PRICE-CHANGE
+  - Fired when the price of the underlying asset of an Iron Bank market changes drastically (More than 30% for 1 hour)
   - Severity is always set to "medium"
   - Type is always set to "info"
   - Metadata field:
-    - "account" - the address that interacted with the markets
-    - "interactions" - an array of interaction. Each contains the hash of the transaction and the name of the action
+    - "market" - the Iron Bank market
+    - "oldPrice" - the price before the interval time
+    - "price" - the current price
+    - "percentage" - the percentage diff of the prices

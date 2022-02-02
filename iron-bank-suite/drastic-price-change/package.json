@@ -1,7 +1,7 @@
 {
-  "name": "iron-bank-high-number-of-interactions-by-address",
+  "name": "iron-bank-drastic-price-change",
   "version": "0.0.1",
-  "description": "Detects if an address interacts with Iron Bank markets a lot in a time interval",
+  "description": "Detects if the price of the underlying asset of an Iron Bank market changes drastically",
   "scripts": {
     "start": "npm run start:dev",
     "start:dev": "nodemon --watch src --watch forta.config.json -e js,json --exec \"forta-agent run\"",
