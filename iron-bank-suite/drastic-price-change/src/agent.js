@@ -48,7 +48,13 @@ async function handleBlock(blockEvent) {
     decimals = 18 + (18 - decimals)
     const price = ethers.utils.formatUnits(prices[i], decimals)
 
-    const oldPrice = addPrice(address, price, timestamp)
+    const oldPrice = getOldestPriceStoredForAsset(address, timestamp)
+
+    // Add the current price
+    oraclePrices[address].push({
+      price,
+      timestamp,
+    })
 
     if (!oldPrice) return
 
@@ -61,20 +67,14 @@ async function handleBlock(blockEvent) {
   return findings
 }
 
-function addPrice(market, price, timestamp) {
-  // Append price
-  oraclePrices[market].push({
-    price,
-    timestamp,
-  })
-
+function getOldestPriceStoredForAsset(market, timestamp) {
   // Filter out any prices that fall outside of the time interval
   oraclePrices[market] = oraclePrices[market].filter(
     (p) => p.timestamp >= timestamp - INTERVAL
   )
 
   // Return null if there is only one price (the current one)
-  if (oraclePrices[market].length === 1) return null
+  if (oraclePrices[market].length === 0) return null
 
   // Return null if the difference between the current and the oldest price 
   // is not at least 90% of the timeInterval
