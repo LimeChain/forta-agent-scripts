@@ -18,25 +18,23 @@ const exchangeRateStored = ethers.utils.parseEther("100")
 
 describe("borrow-amount-close-to-total-supply agent", () => {
   const mockTxEvent = { filterLog: jest.fn() }
-  const mockContract = {
-    totalSupply: jest.fn(),
-    exchangeRateStored: jest.fn()
+  const mockProvider = {
+    all: jest.fn(),
   }
   const markets = {
-    "0x41c84c0e2ee0b740cf0d31f63f3b6f627dc6b393": { name: "cyWETH", decimals: 18 }
+    "0x41c84c0e2ee0b740cf0d31f63f3b6f627dc6b393": { name: "cyWETH", decimalsUnderlying: 18 }
   }
 
-  const mockCreateContract = () => mockContract
+  const mockCreateProvider = () => mockProvider
   const mockGetMarkets = () => markets
 
   beforeAll(async () => {
-    initialize = provideHandleInitialize(mockCreateContract, mockGetMarkets)
+    initialize = provideHandleInitialize(mockGetMarkets, mockCreateProvider)
     await initialize()
   })
 
   beforeEach(() => {
-    mockContract.totalSupply.mockReset()
-    mockContract.exchangeRateStored.mockReset()
+    mockProvider.all.mockReset()
     mockTxEvent.filterLog.mockReset()
   })
 
@@ -54,8 +52,9 @@ describe("borrow-amount-close-to-total-supply agent", () => {
         args: { borrower, borrowAmount },
       }
       mockTxEvent.filterLog.mockReturnValueOnce([mockMintEvent])
-      mockContract.totalSupply.mockReturnValueOnce(totalSupply)
-      mockContract.exchangeRateStored.mockReturnValueOnce(exchangeRateStored)
+      // mockContract.totalSupply.mockReturnValueOnce(totalSupply)
+      // mockContract.exchangeRateStored.mockReturnValueOnce(exchangeRateStored)
+      mockProvider.all.mockReturnValueOnce([totalSupply, exchangeRateStored])
 
       const findings = await handleTransaction(mockTxEvent)
 
