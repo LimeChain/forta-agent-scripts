@@ -52,8 +52,6 @@ describe("borrow-amount-close-to-total-supply agent", () => {
         args: { borrower, borrowAmount },
       }
       mockTxEvent.filterLog.mockReturnValueOnce([mockMintEvent])
-      // mockContract.totalSupply.mockReturnValueOnce(totalSupply)
-      // mockContract.exchangeRateStored.mockReturnValueOnce(exchangeRateStored)
       mockProvider.all.mockReturnValueOnce([totalSupply, exchangeRateStored])
 
       const findings = await handleTransaction(mockTxEvent)
