@@ -60,7 +60,7 @@ const checkAmount = async (event) => {
   const totalUnderlyingSupplyNum = ethers.utils.formatUnits(totalUnderlyingSupply, decimalsUnderlying+18)
 
   const percentage = calculatePercentage(borrowAmountNum, totalUnderlyingSupplyNum)
-  console.log(percentage)
+
   if (percentage > PERCENTAGE_THRESHOLD) {
     return Finding.fromObject({
       name: "Borrow amount close to total supply",
