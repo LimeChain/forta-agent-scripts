@@ -1,7 +1,7 @@
 const { Finding, FindingSeverity, FindingType, ethers, getEthersProvider } = require("forta-agent")
 const { Contract, Provider } = require('ethers-multicall')
+const { getMarkets } = require("../../helper")
 
-const ethcallProvider = new Provider(getEthersProvider(), 1)
 const comptrollerAddress = "0xab1c342c7bf5ec5f02adea1c2270670bca144cbb"
 const comptrollerAbi = [ "function getAllMarkets() public view returns (address[] memory)" ]
 
@@ -14,14 +14,17 @@ const eventSig = "event Borrow(address borrower, uint256 borrowAmount, uint256 a
 const PERCENTAGE_THRESHOLD = 10
 
 const contracts = {}
+let ethcallProvider
 let markets
 
-function provideHandleInitialize(createContract, getMarkets) {
+function provideHandleInitialize(getMarkets, createProvider) {
   return async function initialize() {
     markets = await getMarkets()
     for (const address of Object.keys(markets)) {
-      contracts[address] = createContract(address)
+      contracts[address] = new Contract(address, abi)
     }
+
+    ethcallProvider = createProvider()
   }
 }
 
@@ -39,18 +42,22 @@ async function handleTransaction(txEvent) {
 const checkAmount = async (event) => {
   const market = event.address
   const { borrower, borrowAmount } = event.args
-  const decimals = markets[market].decimals
+  const decimalsUnderlying = markets[market].decimalsUnderlying
 
-  const totalSupply = await contracts[market].totalSupply()
-  const exchangeRate = await contracts[market].exchangeRateStored()
+  const calls = [
+    contracts[market].totalSupply(),
+    contracts[market].exchangeRateStored()
+  ]
+
+  const [ totalSupply, exchangeRate ] = await ethcallProvider.all(calls)
 
   const totalUnderlyingSupply = totalSupply.mul(exchangeRate)
 
   // Convert borrowAmount and totalUnderlyingSupply to formated string
   // for the borrowAmount use the decimals of the underlying asset
   // for the totalUnderlyingSupply use decimals + 18 (the exchange rate is always scaled by 1e18)
-  const borrowAmountNum = ethers.utils.formatUnits(borrowAmount, decimals)
-  const totalUnderlyingSupplyNum = ethers.utils.formatUnits(totalUnderlyingSupply, decimals+18)
+  const borrowAmountNum = ethers.utils.formatUnits(borrowAmount, decimalsUnderlying)
+  const totalUnderlyingSupplyNum = ethers.utils.formatUnits(totalUnderlyingSupply, decimalsUnderlying+18)
 
   const percentage = calculatePercentage(borrowAmountNum, totalUnderlyingSupplyNum)
 
@@ -78,59 +85,12 @@ const calculatePercentage = (borrowAmountNum, totalUnderlyingSupplyNum) => {
   return (borrowAmountNum/totalUnderlyingSupplyNum * 100).toFixed(2)
 }
 
-const createContract = (address) => {
-  return new ethers.Contract(address, abi, getEthersProvider())
-}
-
-const getMarkets = async () => {
-  const tokenAbi = [ 
-    "function symbol() external view returns (string memory)" ,
-    "function underlying() public view returns (address)",
-    "function decimals() external view returns (uint8)"
-  ]
-
-  const contract = new ethers.Contract(comptrollerAddress, comptrollerAbi, getEthersProvider())
-
-  // get the addreses of the markets
-  marketsAddresses = (await contract.getAllMarkets())
-    .map(address => address.toLowerCase())
-
-  // get their symbols
-  let calls = marketsAddresses.map(address => {
-    const tokenContract = new Contract(address, tokenAbi)
-    return tokenContract.symbol()
-  })
-
-  const symbols = await ethcallProvider.all(calls)
-
-  // get the addresses of the underlying assets
-  calls = marketsAddresses.map(address => {
-    const tokenContract = new Contract(address, tokenAbi)
-    return tokenContract.underlying()
-  })
-
-  const underlyingAddress = await ethcallProvider.all(calls)
-
-  // get the decimals of the underlying assets
-  calls = underlyingAddress.map(address => {
-    const tokenContract = new Contract(address, tokenAbi)
-    return tokenContract.decimals()
-  })
-
-  const decimals = await ethcallProvider.all(calls)
-
-  // We construct the markets object.
-  // The key is the market's address 
-  // the object contains its name (symbol) and the decimals of the underlying asset
-  const markets = {}
-  marketsAddresses.forEach((market, i) => {
-    markets[market] = { name: symbols[i], decimals: decimals[i] }
-  })
-  return markets
+const createProvider = () => {
+  return new Provider(getEthersProvider(), 1)
 }
 
 module.exports = {
   provideHandleInitialize,
-  initialize: provideHandleInitialize(createContract, getMarkets),
+  initialize: provideHandleInitialize(getMarkets, createProvider),
   handleTransaction
 }
