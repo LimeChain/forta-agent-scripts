@@ -74,8 +74,6 @@ describe("drastic-price-change agent", () => {
           type: FindingType.Info,
           metadata: {
             market: "cyWETH",
-            oldPrice: "100.0",
-            price: "200.0",
             percentage: "100.00"
           },
         }),

@@ -40,13 +40,7 @@ async function handleBlock(blockEvent) {
   const prices = await ethcallProvider.all(calls)
 
   Object.entries(markets).forEach(([address, market], i) => {
-    let decimals = markets[address].decimalsUnderlying
-
-    // getUnderlying always returns the price with 18 decimals and we have
-    // to convert it to the decimals of the underlying asset
-    // for cyWETH it is 18; for cyBTC is 18 + 10 = 28
-    decimals = 18 + (18 - decimals)
-    const price = ethers.utils.formatUnits(prices[i], decimals)
+    const price = ethers.utils.formatEther(prices[i])
 
     const oldPrice = getOldestPriceStoredForAsset(address, timestamp)
 
@@ -60,7 +54,7 @@ async function handleBlock(blockEvent) {
 
     const percentage = calculatePercentage(price, oldPrice)
     if (Math.abs(percentage) > PERCENTAGE_THRESHOLD) {
-      findings.push(createAlert(market.name, price, oldPrice, percentage))
+      findings.push(createAlert(market.name, percentage))
     }
   })
 
@@ -84,7 +78,7 @@ function getOldestPriceStoredForAsset(market, timestamp) {
   return oldestPrice.price
 }
 
-const createAlert = (market, price, oldPrice, percentage) => {
+const createAlert = (market, percentage) => {
   return Finding.fromObject({
     name: "Drastic price change",
     description: `Price for ${market} changed with ${percentage}% for the last ${INTERVAL/60} minutes`,
@@ -94,8 +88,6 @@ const createAlert = (market, price, oldPrice, percentage) => {
     type: FindingType.Info,
     metadata: {
       market,
-      oldPrice,
-      price,
       percentage
     },
   })
