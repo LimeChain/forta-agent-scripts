@@ -4,12 +4,12 @@ const {
   Finding,
   ethers
 } = require("forta-agent")
-const { handleTransaction } = require("./agent")
+const { handleTransaction, provideInitialize } = require("./agent")
 
-const { markets } = require("./iron-bank-markets")
+const market = "0x41c84c0e2ee0b740cf0d31f63f3b6f627dc6b393"
 
 const mockMintEvent = {
-  address: markets["cyWETH"],
+  address: market,
 }
 const mockAaveEvent = {
   address: "aaveAddress",
@@ -40,6 +40,18 @@ const mockDydxDepositEvent = {
 describe("mint-or-borrow-with-flashloan agent", () => {
   const mockTxEvent = { filterLog: jest.fn() }
 
+  const markets = {}
+  markets[market] = { 
+    name: "cyWETH",
+    decimalsUnderlying: 18
+  }
+  const mockGetMarkets = () => markets
+
+  beforeAll(async () => {
+    initialize = provideInitialize(mockGetMarkets)
+    await initialize()
+  })
+
   beforeEach(() => {
     mockTxEvent.filterLog.mockReset()
   })
@@ -54,6 +66,7 @@ describe("mint-or-borrow-with-flashloan agent", () => {
 
     it("returns a finding if there is a mint or borrow in the same tx as AAVE flashloan", async () => {
       mockTxEvent.filterLog.mockReturnValueOnce([mockMintEvent])
+      mockTxEvent.filterLog.mockReturnValueOnce([]) // Iron Bank flashloan check
       mockTxEvent.filterLog.mockReturnValueOnce([mockAaveEvent]) // AAVE flashloan check
       mockTxEvent.filterLog.mockReturnValueOnce([]) // dydx flashloan check
       const findings = await handleTransaction(mockTxEvent)
@@ -72,6 +85,7 @@ describe("mint-or-borrow-with-flashloan agent", () => {
 
     it("returns a finding if there is a mint or borrow in the same tx as dydx flashloan", async () => {
       mockTxEvent.filterLog.mockReturnValueOnce([mockMintEvent])
+      mockTxEvent.filterLog.mockReturnValueOnce([]) // Iron Bank flashloan check
       mockTxEvent.filterLog.mockReturnValueOnce([]) // AAVE flashloan check
       mockTxEvent.filterLog.mockReturnValueOnce([mockDydxWithdrawEvent, mockDydxDepositEvent]) // dydx flashloan check
       const findings = await handleTransaction(mockTxEvent)

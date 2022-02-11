@@ -1,7 +1,15 @@
 const { Finding, FindingSeverity, FindingType } = require("forta-agent")
-const { markets } = require("./iron-bank-markets")
+const { getMarkets } = require("./helper")
 
-const marketsAddresses = Object.values(markets)
+let markets
+let marketsAddresses
+
+function provideInitialize(getMarkets) {
+  return async function initialize() {
+    markets = await getMarkets()
+    marketsAddresses = Object.keys(markets)
+  }
+}
 
 async function handleTransaction(txEvent) {
   const findings = []
@@ -10,6 +18,8 @@ async function handleTransaction(txEvent) {
   const traces = txEvent.traces
     .filter(trace => trace.action.input.startsWith("0xc5ebeaec") 
       && marketsAddresses.includes(trace.action.to))
+
+      console.log(traces)
 
   // The root borrow event
   // If we detect a nested borrow we fire an alert
@@ -46,5 +56,7 @@ const createAlert = () => {
 }
 
 module.exports = {
+  provideInitialize,
+  initialize: provideInitialize(getMarkets),
   handleTransaction
 }

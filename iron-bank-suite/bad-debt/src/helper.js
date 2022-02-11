@@ -50,5 +50,8 @@ module.exports = {
             markets[market] = { name: symbols[i], decimalsUnderlying: decimals[i] }
         })
         return markets
+    },
+    getProvider: () => {
+        return ethcallProvider
     }
 }

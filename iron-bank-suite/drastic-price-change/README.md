@@ -16,6 +16,4 @@ Detects if the price of the underlying asset of an Iron Bank market changes dras
   - Type is always set to "info"
   - Metadata field:
     - "market" - the Iron Bank market
-    - "oldPrice" - the price before the interval time
-    - "price" - the current price
     - "percentage" - the percentage diff of the prices

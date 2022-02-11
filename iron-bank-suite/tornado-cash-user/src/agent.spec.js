@@ -5,10 +5,10 @@ const {
   ethers,
   createTransactionEvent
 } = require("forta-agent")
-const { provideHandleTransaction } = require("./agent")
-const { markets } = require("./agent-config")
+const { provideHandleTransaction, provideInitialize } = require("./agent")
 
 const account = '0xaccount'
+const market = "0x41c84c0e2ee0b740cf0d31f63f3b6f627dc6b393"
 let handleTransaction
 const mockResponse = jest.fn()
 
@@ -37,7 +37,13 @@ describe("tornado cash user agent", () => {
     })
   }
 
-  beforeAll(() => {
+  const markets = {}
+  markets[market] = { name: "cyWETH", decimalsUnderlying: 18 }
+  const mockGetMarkets = () => markets
+
+  beforeAll(async () => {
+    initialize = provideInitialize(mockGetMarkets)
+    await initialize()
     handleTransaction = provideHandleTransaction(mockResponse)
   })
 
@@ -52,7 +58,7 @@ describe("tornado cash user agent", () => {
       const txEvent = createTxEvent({
         from: account,
         blockNumber: 1000,
-        addresses: {[markets['cyWETH']]: true}
+        addresses: {[market]: true}
       })
       const findings = await handleTransaction(txEvent)
 
@@ -65,7 +71,7 @@ describe("tornado cash user agent", () => {
       const txEvent = createTxEvent({
         from: account,
         blockNumber: 1000,
-        addresses: { [markets['cyWETH']]: true }
+        addresses: { [market]: true }
       })
       const findings = await handleTransaction(txEvent)
 

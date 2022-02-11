@@ -1,8 +1,17 @@
 const { Finding, FindingSeverity, FindingType } = require("forta-agent")
-const { markets } = require("./iron-bank-markets")
+const { getMarkets } = require("./helper")
 
-const marketsAddresses = Object.values(markets)
 const MARKETS_COUNT_THRESHOLD = 4
+
+let markets
+let marketsAddresses
+
+function provideInitialize(getMarkets) {
+  return async function initialize() {
+    markets = await getMarkets()
+    marketsAddresses = Object.keys(markets)
+  }
+}
 
 async function handleTransaction(txEvent) {
   const findings = []
@@ -27,5 +36,7 @@ async function handleTransaction(txEvent) {
 }
 
 module.exports = {
+  provideInitialize,
+  initialize: provideInitialize(getMarkets),
   handleTransaction
 }

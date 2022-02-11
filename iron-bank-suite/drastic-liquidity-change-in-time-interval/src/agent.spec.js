@@ -40,9 +40,9 @@ describe("drastic-price-change agent", () => {
   const mockProvider = { all: jest.fn() }
   const mockCreateProvider = () => mockProvider
 
-  beforeAll(() => {
+  beforeAll(async () => {
     const initialize = provideInitialize(mockGetMarkets, mockCreateProvider)
-    initialize()
+    await initialize()
   })
 
   beforeEach(() => {

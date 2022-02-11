@@ -26,9 +26,9 @@ describe("high-number-of-interactions-by-address agent", () => {
   }
   const mockGetMarkets = () => markets
 
-  beforeAll(() => {
+  beforeAll(async () => {
     const initialize = provideInitialize(mockGetMarkets)
-    initialize()
+    await initialize()
   })
 
   beforeEach(() => {

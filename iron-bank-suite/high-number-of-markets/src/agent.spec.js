@@ -3,16 +3,26 @@ const {
   FindingSeverity,
   Finding,
   createTransactionEvent,
-  ethers
 } = require("forta-agent")
-const { handleTransaction } = require("./agent");
-const { markets } = require("./iron-bank-markets");
+const { handleTransaction, provideInitialize } = require("./agent")
 
 describe("high-number-of-markets agent", () => {
+  const markets = {}
+  markets["0xmarket0"] = { name: "cyWETH", decimalsUnderlying: 18 }
+  markets["0xmarket1"] = { name: "cyWBTC", decimalsUnderlying: 18 }
+  markets["0xmarket2"] = { name: "cyUSDT", decimalsUnderlying: 18 }
+  markets["0xmarket3"] = { name: "cyUSDC", decimalsUnderlying: 18 }
+  markets["0xmarket4"] = { name: "cyUNI", decimalsUnderlying: 18 }
+  const mockGetMarkets = () => markets
+
+  beforeAll(async () => {
+    initialize = provideInitialize(mockGetMarkets)
+    await initialize()
+  })
 
   describe("handleTransaction", () => {
     it("returns empty findings if there is <= 4 markets", async () => {
-      const addresses = {[markets["cyWETH"]]: true}
+      const addresses = {["0xmarket0"]: true}
       const txEvent = createTransactionEvent({ addresses })
       const findings = await handleTransaction(txEvent)
 
@@ -22,11 +32,11 @@ describe("high-number-of-markets agent", () => {
     it("returns a finding if there is > 4 markets", async () => {    
       // We add 5 Iron Bank markets to the tx addresses  
       const addresses = {
-        [markets["cyWETH"]]: true, 
-        [markets["cyWBTC"]]: true, 
-        [markets["cyUSDT"]]: true, 
-        [markets["cyUSDC"]]: true, 
-        [markets["cyUNI"]]: true
+        ["0xmarket0"]: true, 
+        ["0xmarket1"]: true, 
+        ["0xmarket2"]: true, 
+        ["0xmarket3"]: true, 
+        ["0xmarket4"]: true
     }
       const txEvent = createTransactionEvent({ addresses })
       const findings = await handleTransaction(txEvent)

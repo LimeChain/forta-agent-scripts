@@ -38,9 +38,9 @@ describe("drastic-price-change agent", () => {
   const mockProvider = { all: jest.fn() }
   const mockCreateProvider = () => mockProvider
 
-  beforeAll(() => {
+  beforeAll(async () => {
     const initialize = provideInitialize(mockGetMarkets, mockCreateProvider)
-    initialize()
+    await initialize()
   })
 
   beforeEach(() => {
@@ -59,7 +59,6 @@ describe("drastic-price-change agent", () => {
 
       mockProvider.all.mockReturnValueOnce([oraclePrice1])
       mockProvider.all.mockReturnValueOnce([oraclePrice2])
-
 
       await handleBlock(mockBlockEvent1)
       const findings = await handleBlock(mockBlockEvent2)

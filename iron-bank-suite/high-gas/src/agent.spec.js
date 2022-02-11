@@ -4,10 +4,22 @@ const {
   Finding,
   createTransactionEvent
 } = require("forta-agent")
-const { handleTransaction } = require("./agent")
-const { markets } = require("./iron-bank-markets")
+const { handleTransaction, provideInitialize } = require("./agent")
+
+const market = "0x41c84c0e2ee0b740cf0d31f63f3b6f627dc6b393"
 
 describe("high-gas agent", () => {
+  const markets = {}
+  markets[market] = { 
+    name: "cyWETH",
+    decimalsUnderlying: 18
+  }
+  const mockGetMarkets = () => markets
+
+  beforeAll(async () => {
+    const initialize = provideInitialize(mockGetMarkets)
+    await initialize()
+  })
 
   const createTxEvent = ({ gasUsed, addresses }) =>
     createTransactionEvent({
@@ -21,7 +33,7 @@ describe("high-gas agent", () => {
       const gasUsed = `0x${gasUsedDecimal.toString(16)}`
       const txEvent = createTxEvent({
         gasUsed,
-        addresses: { [markets['cyWETH']]: true }
+        addresses: { [market]: true }
       })
       const findings = await handleTransaction(txEvent)
 
@@ -33,7 +45,7 @@ describe("high-gas agent", () => {
       const gasUsed = `0x${gasUsedDecimal.toString(16)}`
       const txEvent = createTxEvent({
         gasUsed,
-        addresses: { [markets['cyWETH']]: true }
+        addresses: { [market]: true }
       })
       const findings = await handleTransaction(txEvent)
 

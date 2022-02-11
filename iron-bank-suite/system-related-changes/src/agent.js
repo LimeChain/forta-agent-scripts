@@ -1,14 +1,22 @@
 const { Finding, FindingSeverity, FindingType } = require("forta-agent")
-const { markets, comptrollerEventSigs, marketEventSigs } = require("./agent-config")
+const { comptrollerEventSigs, marketEventSigs } = require("./agent-config")
+const { getMarkets } = require("./helper")
 
-const marketsAddresses = Object.values(markets)
 const comptrollerAddress = "0xab1c342c7bf5ec5f02adea1c2270670bca144cbb"
+
+let markets
+
+function provideInitialize(getMarkets) {
+  return async function initialize() {
+    markets = await getMarkets()
+  }
+}
 
 async function handleTransaction(txEvent) {
   const findings = []
 
   const events = txEvent.filterLog([...comptrollerEventSigs, ...marketEventSigs])
-    .filter(e => marketsAddresses.includes(e.address) || e.address === comptrollerAddress)
+    .filter(e => markets[e.address] || e.address === comptrollerAddress)
 
   events.forEach(e => findings.push(createAlert(e)))
 
@@ -43,5 +51,7 @@ const getAddressName = (address) => {
 }
 
 module.exports = {
+  provideInitialize,
+  initialize: provideInitialize(getMarkets),
   handleTransaction
 }
