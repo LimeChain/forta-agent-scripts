@@ -4,21 +4,22 @@ const {
   Finding,
   ethers
 } = require("forta-agent")
-const { handleTransaction, initialize } = require("./agent")
-const { markets } = require("./iron-bank-markets")
+const { handleTransaction, provideHandleInitialize } = require("./agent")
 
 const ten = ethers.BigNumber.from(10)
 const twenty = ethers.BigNumber.from(20)
 
+const market = "0x41c84c0e2ee0b740cf0d31f63f3b6f627dc6b393"
+
 const firstLog = {
-  address: markets['cyWETH'],
+  address: market,
   args: {
     cashPrior: ten,
     totalBorrows: ten
   }
 }
 const secondLog = {
-  address: markets['cyWETH'],
+  address: market,
   args: {
     cashPrior: twenty,
     totalBorrows: ten
@@ -28,9 +29,21 @@ const secondLog = {
 describe("drastic-liquidity-change agent", () => {
   const mockTxEvent = { filterLog: jest.fn() }
 
+  const markets = {}
+  markets[market] = {
+    name: "cyWETH",
+    decimalsUnderlying: 18
+  }
+  
+  const mockGetMarkets = () => markets
+
+  beforeAll(async () => {
+    initialize = provideHandleInitialize(mockGetMarkets)
+    await initialize()
+  })
+
   beforeEach(() => {
     mockTxEvent.filterLog.mockReset()
-    initialize()
   })
 
   describe("handleTransaction", () => {
@@ -60,7 +73,7 @@ describe("drastic-liquidity-change agent", () => {
           severity: FindingSeverity.Medium,
           type: FindingType.Suspicious,
           metadata: {
-            address: markets['cyWETH'],
+            address: market,
             percentage: "100.00",
             type: "cashPrior"
           },

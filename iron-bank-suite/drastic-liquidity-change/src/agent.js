@@ -1,21 +1,27 @@
 const { Finding, FindingSeverity, FindingType, ethers } = require("forta-agent")
-const { markets } = require("./iron-bank-markets")
+const { getMarkets } = require("./helper")
 
-const marketsAddresses = Object.values(markets)
 const eventSig = "event AccrueInterest(uint256 cashPrior, uint256 interestAccumulated, uint256 borrowIndex, uint256 totalBorrows)"
 const PERCENTAGE_THRESHOLD = 70
 
 const marketsLiquidity = {}
+let markets
 
-function initialize() {
-  marketsAddresses.forEach(a => marketsLiquidity[a] = {})
+function provideHandleInitialize(getMarkets) {
+  return async function initialize() {
+    markets = await getMarkets()
+    
+    Object.keys(markets).forEach( (address) => {
+      marketsLiquidity[address] = {}
+    })
+  }
 }
 
 async function handleTransaction(txEvent) {
   const findings = []
 
   const events = txEvent.filterLog(eventSig)
-    .filter(e => marketsAddresses.includes(e.address))
+    .filter(e => markets[e.address])
 
   for(const event of events) {
     const address = event.address
@@ -63,7 +69,7 @@ const createTotalBorrowsAlert = (address, percentage) => {
 const createAlert = (address, percentage, type) => {
   return Finding.fromObject({
       name: "Drastic liquidity change",
-      description: `${type} for ${getAddressName(address)} has drastically changed`,
+      description: `${type} for ${markets[address].name} has drastically changed`,
       alertId: "IRON-BANK-DRASTIC-LIQUIDITY-CHANGE",
       protocol: "iron-bank",
       severity: FindingSeverity.Medium,
@@ -76,13 +82,8 @@ const createAlert = (address, percentage, type) => {
     })
 }
 
-const getAddressName = (address) => {
-  for (const [key, value] of Object.entries(markets)) {
-    if (address === value) return key
-  }
-}
-
 module.exports = {
+  provideHandleInitialize,
   handleTransaction,
-  initialize
+  initialize:  provideHandleInitialize(getMarkets)
 }

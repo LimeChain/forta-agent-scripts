@@ -1,11 +1,11 @@
 const { Finding, FindingSeverity, FindingType, ethers } = require("forta-agent")
-const { markets } = require("./iron-bank-markets")
+const { getMarkets } = require("./helper")
 
-const marketsAddresses = Object.values(markets)
 const ironBankEventSigs = [
   "event Mint(address minter, uint256 mintAmount, uint256 mintTokens)",
   "event Borrow(address borrower, uint256 borrowAmount, uint256 accountBorrows, uint256 totalBorrows)"
 ]
+const ironBankFlashloanSig = "event Flashloan(address indexed receiver, uint256 amount, uint256 totalFee, uint256 reservesFee)"
 
 const aaveFlashloanSig = "event FlashLoan(address indexed target, address indexed initiator, address indexed asset, uint256 amount, uint256 premium, uint16 referralCode)"
 const aaveLendingPoolAddress = "0x7d2768de32b0b80b7a3454c06bdac94a69ddc7a9"
@@ -21,6 +21,16 @@ const dydxEventSigs = [
 const zero = ethers.constants.Zero
 const two = ethers.BigNumber.from(2)
 
+let markets
+let marketsAddresses
+
+function provideInitialize(getMarkets) {
+  return async function initialize() {
+    markets = await getMarkets()
+    marketsAddresses = Object.keys(markets)
+  }
+}
+
 async function handleTransaction(txEvent) {
   const findings = []
 
@@ -28,10 +38,11 @@ async function handleTransaction(txEvent) {
     .some(event => marketsAddresses.includes(event.address))
   if (!hasMintOrBorrow) return findings
 
-  const hasAaveFlashLoan = checkForAaveFlashLoan(txEvent)
+  const hasIronBankFlashloan = checkForIronBankFlashloan(txEvent)
+  const hasAaveFlashloan = checkForAaveFlashloan(txEvent)
   const hasDydxFlashloan = checkForDydxFlashloan(txEvent)
 
-  if (hasAaveFlashLoan || hasDydxFlashloan) {
+  if (hasIronBankFlashloan || hasAaveFlashloan || hasDydxFlashloan) {
     findings.push(Finding.fromObject({
       name: "Iron Bank interaction and flashloan",
       description: `Iron Bank interaction in the same tx as flashloan`,
@@ -45,7 +56,13 @@ async function handleTransaction(txEvent) {
   return findings
 }
 
-const checkForAaveFlashLoan = (txEvent) => {
+const checkForIronBankFlashloan = (txEvent) => {
+  const events = txEvent.filterLog(ironBankFlashloanSig)
+    .some(event => marketsAddresses.includes(event.address))
+  return !!events.length
+}
+
+const checkForAaveFlashloan = (txEvent) => {
   const events = txEvent.filterLog(aaveFlashloanSig, aaveLendingPoolAddress)
   return !!events.length
 }
@@ -91,5 +108,7 @@ const checkForDydxFlashloan = (txEvent) => {
 }
 
 module.exports = {
+  provideInitialize,
+  initialize: provideInitialize(getMarkets),
   handleTransaction
 }

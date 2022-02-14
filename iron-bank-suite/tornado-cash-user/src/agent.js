@@ -1,8 +1,7 @@
 const { Finding, FindingSeverity, FindingType } = require("forta-agent")
 const axios = require("axios")
-const { timeFrameBlocks, markets } = require("./agent-config")
-
-const marketsAddresses = Object.values(markets)
+const { timeFrameBlocks } = require("./agent-config")
+const { getMarkets } = require("./helper")
 
 const tornadoCashAddresses = [
   '0x12D66f87A04A9E220743712cE6d9bB1B5616B8Fc', // 0.1 ETH
@@ -14,6 +13,16 @@ const tornadoCashAddresses = [
 // We cannot put the key in a config file
 // because it would be easy to extract it
 const apiKey = "test"
+
+let markets
+let marketsAddresses
+
+function provideInitialize(getMarkets) {
+  return async function initialize() {
+    markets = await getMarkets()
+    marketsAddresses = Object.keys(markets)
+  }
+}
 
 function provideHandleTransaction(getEtherscanResponse) {
   return async function handleTransaction(txEvent) {
@@ -61,6 +70,8 @@ const getEtherscanQuery = (txEvent) => {
 }
 
 module.exports = {
+  provideInitialize,
+  initialize: provideInitialize(getMarkets),
   handleTransaction: provideHandleTransaction(getEtherscanResponse),
   provideHandleTransaction
 }

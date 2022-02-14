@@ -1,6 +1,6 @@
-const { Finding, FindingSeverity, FindingType, ethers, getEthersProvider } = require("forta-agent")
-const { markets } = require("./iron-bank-markets")
-const { Contract, Provider } = require('ethers-multicall')
+const { Finding, FindingSeverity, FindingType, ethers } = require("forta-agent")
+const { Contract } = require('ethers-multicall')
+const { getMarkets, getProvider } = require("./helper")
 
 const eventSigs = [
   "event Borrow(address borrower, uint256 borrowAmount, uint256 accountBorrows, uint256 totalBorrows)",
@@ -9,22 +9,24 @@ const eventSigs = [
 const oracleAddress = "0x6b96c414ce762578c3e7930da9114cffc88704cb"
 const abi = [ "function getUnderlyingPrice(address cToken) public view returns (uint)" ]
 
-const marketsAddresses = Object.values(markets)
 const AMOUNT_THRESHOLD = 5_000_000
 
-let ethcallProvider
 const oracleContract = new Contract(oracleAddress, abi)
 
-function provideInitialize(createProvider) {
+let markets
+let ethcallProvider
+
+function provideInitialize(getMarkets, getProvider) {
   return async function initialize() {
-    ethcallProvider = createProvider()
+    markets = await getMarkets()
+    ethcallProvider = getProvider()
   }
 }
 
 async function handleTransaction(txEvent) {
   // Get only borrow/mint events from Iron Bank markets
   const events = txEvent.filterLog(eventSigs)
-    .filter(e => marketsAddresses.includes(e.address))
+    .filter(e => markets[e.address])
     
   // Use multicall contract to get all prices with only one call
   const calls = events.map(e => oracleContract.getUnderlyingPrice(e.address))
@@ -51,7 +53,7 @@ const checkAmount = (event, price) => {
   if (usdAmount > AMOUNT_THRESHOLD) {
     return new Finding.fromObject({
       name: `${eventName} with high amount`,
-      description: `Address ${account} ${eventName.toLowerCase()}ed $${usdAmount.toFixed(2)} from ${getAddressName(address)}`,
+      description: `Address ${account} ${eventName.toLowerCase()}ed $${usdAmount.toFixed(2)} from ${markets[address].name}`,
       alertId: `IRON-BANK-HIGH-${eventName.toUpperCase()}-AMOUNT`,
       protocol: "iron-bank",
       severity: FindingSeverity.Medium,
@@ -65,18 +67,8 @@ const checkAmount = (event, price) => {
   }
 }
 
-createProvider = () => {
-  return new Provider(getEthersProvider(), 1)
-}
-
-const getAddressName = (address) => {
-  for (const [key, value] of Object.entries(markets)) {
-    if (address === value) return key
-  }
-}
-
 module.exports = {
   provideInitialize,
-  initialize: provideInitialize(createProvider),
+  initialize: provideInitialize(getMarkets, getProvider),
   handleTransaction
 }

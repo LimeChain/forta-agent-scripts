@@ -5,24 +5,33 @@ const {
   ethers,
 } = require("forta-agent")
 const { handleTransaction, provideInitialize } = require("./agent")
-const { markets } = require("./iron-bank-markets")
+
+const market = "0x41c84c0e2ee0b740cf0d31f63f3b6f627dc6b393"
 
 describe("bad debt agent", () => {
+  const markets = {}
+  markets[market] = { 
+    name: "cyWETH",
+    decimalsUnderlying: 18
+  }
+  const mockGetMarkets = () => markets
+  
+  const mockProvider = { all: jest.fn() }
+  const mockCreateProvider = () => mockProvider
+
   const mockTxEvent = { filterLog: jest.fn() }
-  const mockContract = { getAccountLiquidity: jest.fn() }
-  const mockCreateContract = () => mockContract
 
   const shortfall = ethers.BigNumber.from(100)
   const account = '0xaccount'
 
   beforeAll(async () => {
-    initialize = provideInitialize(mockCreateContract)
+    initialize = provideInitialize(mockGetMarkets, mockCreateProvider)
     await initialize()
   })
 
   beforeEach(() => {
     mockTxEvent.filterLog.mockReset()
-    mockContract.getAccountLiquidity.mockReset()
+    mockProvider.all.mockReset()
   })
 
   describe("handleTransaction", () => {
@@ -34,16 +43,15 @@ describe("bad debt agent", () => {
 
     it("returns a finding if the account has shortfall", async () => {
       const mockMintEvent = {
-        address: markets['cyWETH'],
+        address: market,
         args: [ account ],
       }
       mockTxEvent.filterLog.mockReturnValueOnce([mockMintEvent])
-      mockTxEvent.filterLog.mockReturnValue([])
-      mockContract.getAccountLiquidity.mockReturnValueOnce([
+      mockProvider.all.mockReturnValueOnce([[
         ethers.constants.Zero,
         ethers.constants.Zero,
         shortfall,
-      ])
+      ]])
 
       const findings = await handleTransaction(mockTxEvent)
 

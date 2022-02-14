@@ -25,9 +25,9 @@ describe("high-number-of-market-interactions agent", () => {
   }
   const mockGetMarkets = () => markets
 
-  beforeAll(() => {
+  beforeAll(async () => {
     const initialize = provideInitialize(mockGetMarkets)
-    initialize()
+    await initialize()
   })
 
   beforeEach(() => {

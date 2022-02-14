@@ -1,7 +1,8 @@
 {
   "name": "iron-bank-high-mint-or-borrow-amount",
   "version": "0.0.1",
-  "description": "Detects if there is a borrow with high borrow amount",
+  "chainIds": [ 1 ],
+  "repository": "https://github.com/LimeChain/forta-agent-scripts/",
   "scripts": {
     "start": "npm run start:dev",
     "start:dev": "nodemon --watch src --watch forta.config.json -e js,json --exec \"forta-agent run\"",
@@ -19,7 +20,7 @@
   },
   "dependencies": {
     "ethers-multicall": "^0.2.2",
-    "forta-agent": "^0.0.32"
+    "forta-agent": "^0.0.36"
   },
   "devDependencies": {
     "jest": "^27.0.6",

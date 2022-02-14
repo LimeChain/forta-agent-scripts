@@ -1,8 +1,16 @@
 const { Finding, FindingSeverity, FindingType, ethers } = require("forta-agent")
-const { markets } = require("./iron-bank-markets")
+const { getMarkets } = require("./helper")
 
-const marketsAddresses = Object.values(markets)
 const GAS_USED_THRESHOLD = ethers.BigNumber.from(3_000_000)
+
+let markets
+let marketsAddresses
+function provideInitialize(getMarkets) {
+  return async function initialize() {
+    markets = await getMarkets()
+    marketsAddresses = Object.keys(markets)
+  }
+}
 
 async function handleTransaction(txEvent) {
   const findings = []
@@ -31,5 +39,7 @@ async function handleTransaction(txEvent) {
 }
 
 module.exports = {
+  initialize: provideInitialize(getMarkets),
+  provideInitialize,
   handleTransaction
 }

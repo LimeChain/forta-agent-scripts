@@ -1,7 +1,8 @@
 {
   "name": "iron-bank-high-number-of-interactions-by-address",
   "version": "0.0.1",
-  "description": "Detects if an address interacts with Iron Bank markets a lot in a time interval",
+  "chainIds": [ 1 ],
+  "repository": "https://github.com/LimeChain/forta-agent-scripts/",
   "scripts": {
     "start": "npm run start:dev",
     "start:dev": "nodemon --watch src --watch forta.config.json -e js,json --exec \"forta-agent run\"",
@@ -19,7 +20,7 @@
   },
   "dependencies": {
     "ethers-multicall": "^0.2.2",
-    "forta-agent": "^0.0.35"
+    "forta-agent": "^0.0.36"
   },
   "devDependencies": {
     "jest": "^27.0.6",

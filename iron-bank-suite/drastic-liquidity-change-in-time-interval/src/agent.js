@@ -1,6 +1,6 @@
 const { Finding, FindingSeverity, FindingType, getEthersProvider, ethers } = require("forta-agent")
-const { Contract, Provider } = require('ethers-multicall')
-const { getMarkets } = require("../../helper")
+const { Contract } = require('ethers-multicall')
+const { getMarkets, getProvider } = require("./helper")
 
 const INTERVAL = 10 * 60 // 10 minutes
 
@@ -20,7 +20,7 @@ let marketsAddresses
 let ethcallProvider
 const contracts = []
 
-function provideInitialize(getMarkets, createProvider) {
+function provideInitialize(getMarkets, getProvider) {
   return async function initialize() {
     markets = await getMarkets()
     marketsAddresses = Object.keys(markets)
@@ -29,7 +29,7 @@ function provideInitialize(getMarkets, createProvider) {
       previousLiquidities[a] = []
     })
 
-    ethcallProvider = createProvider()
+    ethcallProvider = getProvider()
   }
 }
 
@@ -106,16 +106,12 @@ const createAlert = (market, percentage, type) => {
   })
 }
 
-createProvider = () => {
-  return new Provider(getEthersProvider(), 1)
-}
-
 const calculatePercentage = (current, previous) => {
   return ((current / previous - 1) * 100).toFixed(2)
 }
 
 module.exports = {
-  initialize: provideInitialize(getMarkets, createProvider),
+  initialize: provideInitialize(getMarkets, getProvider),
   provideInitialize,
   handleBlock
 }

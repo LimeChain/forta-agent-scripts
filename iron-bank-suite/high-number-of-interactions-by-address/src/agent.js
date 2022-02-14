@@ -1,5 +1,5 @@
 const { Finding, FindingSeverity, FindingType } = require("forta-agent")
-const { getMarkets } = require("../../helper")
+const { getMarkets } = require("./helper")
 const Counter = require("./counter")
 
 const INTERVAL = 10 * 60 // 10 minutes

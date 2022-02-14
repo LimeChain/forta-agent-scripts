@@ -21,8 +21,10 @@ describe("borrow-amount-close-to-total-supply agent", () => {
   const mockProvider = {
     all: jest.fn(),
   }
-  const markets = {
-    "0x41c84c0e2ee0b740cf0d31f63f3b6f627dc6b393": { name: "cyWETH", decimalsUnderlying: 18 }
+  const markets = {}
+  markets[market] = { 
+    name: "cyWETH",
+    decimalsUnderlying: 18
   }
 
   const mockCreateProvider = () => mockProvider

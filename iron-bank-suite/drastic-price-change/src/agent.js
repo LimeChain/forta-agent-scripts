@@ -1,11 +1,11 @@
-const { Finding, FindingSeverity, FindingType, getEthersProvider, ethers } = require("forta-agent")
-const { Contract, Provider } = require('ethers-multicall')
-const { getMarkets } = require("../../helper")
+const { Finding, FindingSeverity, FindingType, ethers } = require("forta-agent")
+const { Contract } = require('ethers-multicall')
+const { getMarkets, getProvider } = require("./helper")
 
 const INTERVAL = 1 * 60 * 60 // 1 hour
 
 // Check if the delta of the prices is between 90% of the interval and the interval
-const MAX_DELTA_INTERVAL = INTERVAL * 90 / 100 
+const MIN_DELTA_INTERVAL = INTERVAL * 90 / 100 
 const PERCENTAGE_THRESHOLD = 30
 
 const oracleAddress = "0x6b96c414ce762578c3e7930da9114cffc88704cb"
@@ -18,13 +18,13 @@ let marketsAddresses
 let ethcallProvider
 const oracleContract = new Contract(oracleAddress, abi)
 
-function provideInitialize(getMarkets, createProvider) {
+function provideInitialize(getMarkets, getProvider) {
   return async function initialize() {
     markets = await getMarkets()
     marketsAddresses = Object.keys(markets)
     marketsAddresses.forEach(a => oraclePrices[a] = [])
 
-    ethcallProvider = createProvider()
+    ethcallProvider = getProvider()
   }
 }
 
@@ -73,7 +73,7 @@ function getOldestPriceStoredForAsset(market, timestamp) {
   // Return null if the difference between the current and the oldest price 
   // is not at least 90% of the timeInterval
   const oldestPrice = oraclePrices[market][0]
-  if (timestamp - oldestPrice.timestamp < MAX_DELTA_INTERVAL) return null
+  if (timestamp - oldestPrice.timestamp < MIN_DELTA_INTERVAL) return null
 
   return oldestPrice.price
 }
@@ -93,16 +93,12 @@ const createAlert = (market, percentage) => {
   })
 }
 
-createProvider = () => {
-  return new Provider(getEthersProvider(), 1)
-}
-
 const calculatePercentage = (current, previous) => {
   return ((current / previous - 1) * 100).toFixed(2)
 }
 
 module.exports = {
-  initialize: provideInitialize(getMarkets, createProvider),
+  initialize: provideInitialize(getMarkets, getProvider),
   provideInitialize,
   handleBlock
 }

@@ -4,13 +4,24 @@ const {
   Finding,
   ethers
 } = require("forta-agent")
-const { handleTransaction } = require("./agent")
+const { handleTransaction, provideInitialize } = require("./agent")
 
 const address = "0xab1c342c7bf5ec5f02adea1c2270670bca144cbb"
 const name = "NewPriceOracle"
 
 describe("system-related-changes agent", () => {
   const mockTxEvent = { filterLog: jest.fn() }
+  const markets = {}
+  markets["0xmarket"] = { 
+    name: "cyWETH", 
+    decimalsUnderlying: 18 
+  }
+  const mockGetMarkets = () => markets
+
+  beforeAll(async () => {
+    initialize = provideInitialize(mockGetMarkets)
+    await initialize()
+  })
 
   beforeEach(() => {
     mockTxEvent.filterLog.mockReset()

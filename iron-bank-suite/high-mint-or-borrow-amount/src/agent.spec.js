@@ -5,9 +5,8 @@ const {
   ethers
 } = require("forta-agent")
 const { provideInitialize, handleTransaction } = require("./agent")
-const { markets } = require("./iron-bank-markets")
 
-const address = markets["cyWETH"]
+const market = "0x41c84c0e2ee0b740cf0d31f63f3b6f627dc6b393"
 const account = "0xsomeaccount"
 
 // Set the borrow amount to 1000 and the price of 1 ETH to 5100
@@ -17,11 +16,19 @@ const oraclePrice = ethers.utils.parseEther("5100")
 
 describe("high-borrow-amount agent", () => {
   const mockTxEvent = { filterLog: jest.fn() }
+
+  const markets = {}
+  markets[market] = { 
+    name: "cyWETH",
+    decimalsUnderlying: 18
+  }
+  const mockGetMarkets = () => markets
+
   const mockProvider = { all: jest.fn() }
-  const mockCreateProvider = () => mockProvider
+  const mockGetProvider = () => mockProvider
 
   beforeAll(async () => {
-    initialize = provideInitialize(mockCreateProvider)
+    initialize = provideInitialize(mockGetMarkets, mockGetProvider)
     await initialize()
   })
 
@@ -41,7 +48,7 @@ describe("high-borrow-amount agent", () => {
     it("returns a finding if there is a Borrow event with high borrowAmount", async () => {      
       const mockMintEvent = {
         name: 'Borrow',
-        address,
+        address: market,
         args: [ account, amount ],
       }
       mockTxEvent.filterLog.mockReturnValueOnce([mockMintEvent])
@@ -59,7 +66,7 @@ describe("high-borrow-amount agent", () => {
           metadata: {
             account,
             amount: 5100000,
-            market: address
+            market
           },
         }),
       ])
@@ -68,7 +75,7 @@ describe("high-borrow-amount agent", () => {
     it("returns a finding if there is a Mint event with high mintAmount", async () => {      
       const mockMintEvent = {
         name: 'Mint',
-        address,
+        address: market,
         args: [ account, amount ],
       }
       mockTxEvent.filterLog.mockReturnValueOnce([mockMintEvent])
@@ -86,7 +93,7 @@ describe("high-borrow-amount agent", () => {
           metadata: {
             account,
             amount: 5100000,
-            market: address
+            market
           },
         }),
       ])
