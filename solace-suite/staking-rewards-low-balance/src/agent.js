@@ -24,7 +24,7 @@ const handleBlock = async (blockEvent) => {
   const findings = [];
 
   // Check prices every 100 blocks (~20 minutes)
-  // if (blockEvent.blockNumber % 100 !== 0 ) return findings
+  if (blockEvent.blockNumber % 100 !== 0 ) return findings
 
   const stakingRewardsCall = stakingRewarsContract.rewardPerSecond()
   const solaceCall = solaceContract.balanceOf(stakingRewardsAddress)
@@ -33,7 +33,7 @@ const handleBlock = async (blockEvent) => {
 
   const rewardPerYear = rewardPerSecond.mul(SECONDS_TO_YEARS)
   const percentage = balance.mul(100).div(rewardPerYear).toNumber()
-  
+
   if (percentage < PERCENTAGE_THRESHOLD) {
     findings.push(Finding.fromObject({
       name: "Staking rewards contract has low Solace balance",
