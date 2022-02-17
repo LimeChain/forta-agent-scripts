@@ -23,7 +23,7 @@ function provideInitialize(getProvider) {
 const handleBlock = async (blockEvent) => {
   const findings = [];
 
-  // Check prices every 100 blocks (~20 minutes)
+  // Check balance every 100 blocks (~20 minutes)
   if (blockEvent.blockNumber % 100 !== 0 ) return findings
 
   const stakingRewardsCall = stakingRewarsContract.rewardPerSecond()
