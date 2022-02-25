@@ -1,6 +1,7 @@
 {
   "name": "solace-staking-rewards-low-balance-agent",
   "version": "0.0.1",
+  "description": "Detects if the Solace balance of the Staking Rewards contract is low",
   "chainIds": [
     1,
     137

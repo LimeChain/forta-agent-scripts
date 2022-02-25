@@ -12,6 +12,9 @@ const solaceContract = new Contract(solaceAddress, solaceAbi)
 const SECONDS_TO_YEARS = 60 * 60 * 24 * 365
 const PERCENTAGE_THRESHOLD = 20
 
+// 5 per minute * 60 minutes * 24 hours
+const BLOCKS_IN_ONE_DAY = 5 * 60 * 24
+
 let ethcallProvider
 
 function provideInitialize(getProvider) {
@@ -23,8 +26,8 @@ function provideInitialize(getProvider) {
 const handleBlock = async (blockEvent) => {
   const findings = [];
 
-  // Check balance every 100 blocks (~20 minutes)
-  if (blockEvent.blockNumber % 100 !== 0 ) return findings
+  // Check every ~24 hours
+  if (blockEvent.blockNumber % BLOCKS_IN_ONE_DAY !== 0 ) return findings
 
   const stakingRewardsCall = stakingRewarsContract.rewardPerSecond()
   const solaceCall = solaceContract.balanceOf(stakingRewardsAddress)

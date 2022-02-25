@@ -2,7 +2,7 @@
 
 ## Description
 
-This agent detects if the Solace balance of the Staking Rewards contract is low
+Detects if the Solace balance of the Staking Rewards contract is low
 
 ## Supported Chains
 

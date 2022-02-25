@@ -6,7 +6,7 @@ const {
 } = require("forta-agent")
 const { handleBlock, provideInitialize } = require("./agent")
 
-const blockEvent = { blockNumber: 1000 }
+const blockEvent = { blockNumber: 5 * 60 * 24 }
 
 // reward per year is 10m
 const rewardPerSecond = ethers.BigNumber.from("317097919837645865")
