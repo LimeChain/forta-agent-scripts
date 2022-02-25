@@ -1,6 +1,7 @@
 {
   "name": "iron-bank-high-mint-or-borrow-amount",
   "version": "0.0.1",
+  "description": "Detects if there is a mint or borrow with high borrow amount",
   "chainIds": [ 1 ],
   "repository": "https://github.com/LimeChain/forta-agent-scripts/",
   "scripts": {

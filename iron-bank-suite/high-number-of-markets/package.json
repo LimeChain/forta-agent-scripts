@@ -1,6 +1,7 @@
 {
   "name": "iron-bank-high-number-of-markets",
   "version": "0.0.1",
+  "description": "Detects if the transaction interacted with more than 4 Iron Bank markets",
   "chainIds": [ 1 ],
   "repository": "https://github.com/LimeChain/forta-agent-scripts/",
   "scripts": {

@@ -1,6 +1,7 @@
 {
   "name": "iron-bank-high-gas",
   "version": "0.0.1",
+  "description": "Detects if an Iron Bank transaction has high gas usage",
   "chainIds": [ 1 ],
   "repository": "https://github.com/LimeChain/forta-agent-scripts/",
   "scripts": {

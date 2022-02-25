@@ -34,12 +34,15 @@ describe("drastic-price-change agent", () => {
     decimalsUnderlying: 18
   }
   const mockGetMarkets = () => markets
+
+  const mockOracle = "0xoracle"
+  const mockGetOracle = () => mockOracle
   
   const mockProvider = { all: jest.fn() }
-  const mockCreateProvider = () => mockProvider
+  const mockGetProvider = () => mockProvider
 
   beforeAll(async () => {
-    const initialize = provideInitialize(mockGetMarkets, mockCreateProvider)
+    const initialize = provideInitialize(mockGetMarkets, mockGetOracle, mockGetProvider)
     await initialize()
   })
 

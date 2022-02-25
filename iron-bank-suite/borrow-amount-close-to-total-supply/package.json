@@ -1,6 +1,7 @@
 {
   "name": "iron-bank-borrow-amount-close-to-total-supply",
   "version": "0.0.1",
+  "description": "Detects if a borrow amount is close to the total supply of the market",
   "chainIds": [ 1 ],
   "repository": "https://github.com/LimeChain/forta-agent-scripts/",
   "scripts": {

@@ -1,6 +1,7 @@
 {
   "name": "iron-bank-high-number-of-market-interactions",
   "version": "0.0.1",
+  "description": "Detects if there are a lot of interactions with an Iron Bank market in a short time",
   "chainIds": [ 1 ],
   "repository": "https://github.com/LimeChain/forta-agent-scripts/",
   "scripts": {

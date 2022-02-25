@@ -1,6 +1,7 @@
 {
   "name": "iron-bank-system-related-changes",
   "version": "0.0.1",
+  "description": "Detects if system related contracts or variables are changed",
   "chainIds": [ 1 ],
   "repository": "https://github.com/LimeChain/forta-agent-scripts/",
   "scripts": {

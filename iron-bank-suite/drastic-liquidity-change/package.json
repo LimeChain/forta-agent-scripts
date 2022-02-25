@@ -1,6 +1,7 @@
 {
   "name": "iron-bank-drastic-liquidity-change",
   "version": "0.0.1",
+  "description": "Detects if the market's liquidity (cashPrior or totalBorrows) changes drastically",
   "chainIds": [ 1 ],
   "repository": "https://github.com/LimeChain/forta-agent-scripts/",
   "scripts": {

@@ -1,6 +1,7 @@
 {
   "name": "iron-bank-bad-debt-agent",
   "version": "0.0.1",
+  "description": "Detects if account has bad debt immediately after it interacts with Iron Bank market",
   "chainIds": [ 1 ],
   "repository": "https://github.com/LimeChain/forta-agent-scripts/",
   "scripts": {

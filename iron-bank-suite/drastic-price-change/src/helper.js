@@ -2,8 +2,12 @@ const { ethers, getEthersProvider } = require("forta-agent")
 const { Contract, Provider } = require('ethers-multicall')
 
 const comptrollerAddress = "0xab1c342c7bf5ec5f02adea1c2270670bca144cbb"
-const comptrollerAbi = [ "function getAllMarkets() public view returns (address[] memory)" ]
+const comptrollerAbi = [ 
+    "function getAllMarkets() public view returns (address[] memory)",
+    "function oracle() public view returns (address oracle)"
+]
 const ethcallProvider = new Provider(getEthersProvider(), 1)
+const contract = new ethers.Contract(comptrollerAddress, comptrollerAbi, getEthersProvider())
 
 module.exports = {
     getMarkets: async () => {
@@ -12,7 +16,6 @@ module.exports = {
             "function underlying() public view returns (address)",
             "function decimals() external view returns (uint8)"
         ]
-        const contract = new ethers.Contract(comptrollerAddress, comptrollerAbi, getEthersProvider())
 
         // get the addreses of the markets
         marketsAddresses = (await contract.getAllMarkets())
@@ -50,6 +53,9 @@ module.exports = {
             markets[market] = { name: symbols[i], decimalsUnderlying: decimals[i] }
         })
         return markets
+    },
+    getOracle: async () => {
+        return await contract.oracle()
     },
     getProvider: () => {
         return ethcallProvider
