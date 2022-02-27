@@ -1,6 +1,7 @@
 {
   "name": "iron-bank-mint-or-borrow-with-flashloan",
   "version": "0.0.1",
+  "description": "Detects if there is a mint or borrow in the same tx as a flashloan",
   "chainIds": [ 1 ],
   "repository": "https://github.com/LimeChain/forta-agent-scripts/",
   "scripts": {

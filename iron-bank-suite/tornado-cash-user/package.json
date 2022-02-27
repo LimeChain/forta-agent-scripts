@@ -1,6 +1,7 @@
 {
   "name": "iron-bank-tornado-cash-user-agent",
   "version": "0.0.1",
+  "description": "Detects if account interacting with Iron Bank market has withdrawn from Tornado.cash pool",
   "chainIds": [ 1 ],
   "repository": "https://github.com/LimeChain/forta-agent-scripts/",
   "scripts": {

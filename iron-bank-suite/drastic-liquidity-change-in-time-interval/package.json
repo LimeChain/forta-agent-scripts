@@ -1,6 +1,7 @@
 {
   "name": "iron-bank-drastic-liquidity-change-for-time-period",
   "version": "0.0.1",
+  "description": "Detects if an Iron Bank liquidity (cash or total borrows) change drastically for a time period",
   "chainIds": [ 1 ],
   "repository": "https://github.com/LimeChain/forta-agent-scripts/",
   "scripts": {

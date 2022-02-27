@@ -1,6 +1,6 @@
 const { Finding, FindingSeverity, FindingType, ethers } = require("forta-agent")
 const { Contract } = require('ethers-multicall')
-const { getMarkets, getProvider } = require("./helper")
+const { getMarkets, getOracle, getProvider } = require("./helper")
 
 const INTERVAL = 1 * 60 * 60 // 1 hour
 
@@ -8,7 +8,6 @@ const INTERVAL = 1 * 60 * 60 // 1 hour
 const MIN_DELTA_INTERVAL = INTERVAL * 90 / 100 
 const PERCENTAGE_THRESHOLD = 30
 
-const oracleAddress = "0x6b96c414ce762578c3e7930da9114cffc88704cb"
 const abi = ["function getUnderlyingPrice(address cToken) public view returns (uint)"]
 
 const oraclePrices = {}
@@ -16,13 +15,16 @@ const oraclePrices = {}
 let markets
 let marketsAddresses
 let ethcallProvider
-const oracleContract = new Contract(oracleAddress, abi)
+let oracleContract
 
-function provideInitialize(getMarkets, getProvider) {
+function provideInitialize(getMarkets, getOracle, getProvider) {
   return async function initialize() {
     markets = await getMarkets()
     marketsAddresses = Object.keys(markets)
     marketsAddresses.forEach(a => oraclePrices[a] = [])
+
+    const oracleAddress = await getOracle()
+    oracleContract = new Contract(oracleAddress, abi)
 
     ethcallProvider = getProvider()
   }
@@ -98,7 +100,7 @@ const calculatePercentage = (current, previous) => {
 }
 
 module.exports = {
-  initialize: provideInitialize(getMarkets, getProvider),
+  initialize: provideInitialize(getMarkets, getOracle, getProvider),
   provideInitialize,
   handleBlock
 }

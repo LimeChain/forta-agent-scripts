@@ -24,11 +24,14 @@ describe("high-borrow-amount agent", () => {
   }
   const mockGetMarkets = () => markets
 
+  const mockOracle = "0xoracle"
+  const mockGetOracle = () => mockOracle
+
   const mockProvider = { all: jest.fn() }
   const mockGetProvider = () => mockProvider
 
   beforeAll(async () => {
-    initialize = provideInitialize(mockGetMarkets, mockGetProvider)
+    initialize = provideInitialize(mockGetMarkets, mockGetOracle, mockGetProvider)
     await initialize()
   })
 

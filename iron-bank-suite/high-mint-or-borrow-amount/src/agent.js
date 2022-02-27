@@ -1,24 +1,26 @@
 const { Finding, FindingSeverity, FindingType, ethers } = require("forta-agent")
 const { Contract } = require('ethers-multicall')
-const { getMarkets, getProvider } = require("./helper")
+const { getMarkets, getOracle, getProvider } = require("./helper")
 
 const eventSigs = [
   "event Borrow(address borrower, uint256 borrowAmount, uint256 accountBorrows, uint256 totalBorrows)",
   "event Mint (address minter, uint256 mintAmount, uint256 mintTokens)"
 ]
-const oracleAddress = "0x6b96c414ce762578c3e7930da9114cffc88704cb"
 const abi = [ "function getUnderlyingPrice(address cToken) public view returns (uint)" ]
 
 const AMOUNT_THRESHOLD = 5_000_000
 
-const oracleContract = new Contract(oracleAddress, abi)
-
 let markets
+let oracleContract
 let ethcallProvider
 
-function provideInitialize(getMarkets, getProvider) {
+function provideInitialize(getMarkets, getOracle, getProvider) {
   return async function initialize() {
     markets = await getMarkets()
+
+    const oracleAddress = await getOracle()
+    oracleContract = new Contract(oracleAddress, abi)
+    
     ethcallProvider = getProvider()
   }
 }
@@ -69,6 +71,6 @@ const checkAmount = (event, price) => {
 
 module.exports = {
   provideInitialize,
-  initialize: provideInitialize(getMarkets, getProvider),
+  initialize: provideInitialize(getMarkets, getOracle, getProvider),
   handleTransaction
 }

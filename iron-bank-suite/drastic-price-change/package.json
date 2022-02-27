@@ -1,6 +1,7 @@
 {
   "name": "iron-bank-drastic-price-change",
   "version": "0.0.1",
+  "description": "Detects if the price of the underlying asset of an Iron Bank market changes drastically",
   "chainIds": [ 1 ],
   "repository": "https://github.com/LimeChain/forta-agent-scripts/",
     "scripts": {

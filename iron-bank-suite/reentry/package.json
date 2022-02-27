@@ -1,6 +1,7 @@
 {
   "name": "iron-bank-reentry",
   "version": "0.0.1",
+  "description": "Detects if there are nested borrows",
   "chainIds": [ 1 ],
   "repository": "https://github.com/LimeChain/forta-agent-scripts/",
   "scripts": {
