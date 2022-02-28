@@ -11,8 +11,6 @@ Detects if the Solace balance of the Staking Rewards contract is low
 
 ## Alerts
 
-Describe each of the type of alerts fired by this agent
-
 - SOLACE-STAKING-REWARDS-LOW-BALANCE
   - Fired when the Solace balance of the Staking rewards contract falls below a threshold compared to the reward per year
   - Severity is always set to "high"
