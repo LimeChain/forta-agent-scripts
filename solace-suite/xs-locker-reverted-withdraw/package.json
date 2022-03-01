@@ -1,5 +1,5 @@
 {
-  "name": "solace-staking-rewards-low-balance-agent",
+  "name": "solace-xs-locker-reverted-withdraw",
   "version": "0.0.1",
   "description": "Detects if there is an attempt to withdraw from a locked lock",
   "chainIds": [
