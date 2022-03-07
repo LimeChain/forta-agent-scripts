@@ -54,7 +54,4 @@ module.exports = {
         return markets
     },
     getTokenPrices,
-    getProvider: () => {
-        return ethcallProvider
-    }
 }
