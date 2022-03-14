@@ -40,7 +40,7 @@ module.exports = {
         const decimalsCalls = tokenContracts.map(contract => contract.decimals())
         const decimals = await ethcallProvider.all(decimalsCalls)
 
-        const prices = await getPrices(contracts)
+        const prices = await getTokenPrices(contracts)
 
         const markets = symbols.map((symbol, i) => {
             return {
