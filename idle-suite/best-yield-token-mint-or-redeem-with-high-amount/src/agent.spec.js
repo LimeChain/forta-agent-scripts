@@ -57,7 +57,7 @@ describe("best yield token mint or redeem with high amount agent", () => {
     provider.all.mockReset()
   })
 
-  describe("handleBlock", () => {
+  describe("handleTransaction", () => {
     it("returns empty findings if the USD amount is less than the threshold", async () => {
       mockTxEvent.filterLog.mockReturnValueOnce([log])
       provider.all.mockReturnValueOnce([lowPriceUSD, tokenPrice])
