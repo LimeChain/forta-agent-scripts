@@ -21,7 +21,7 @@ const amount = ethers.utils.parseUnits("100", 18)
 // If the price is 1 the amount will be $1000
 const lowPriceUSD = ethers.utils.parseUnits("1", 18)
 
-describe("best yield token price decrease agent", () => {
+describe("best yield token mint or redeem with high amount agent", () => {
   const mockTxEvent = { filterLog: jest.fn() }
 
   const log = {
