@@ -7,7 +7,8 @@ const {
   hasIronBankFlashloan,
   hasAaveFlashloan,
   hasDydxFlashloan,
-  hasMakerFlashloan
+  hasMakerFlashloan,
+  hasEulerFlashloan
 } = require("./helper")
 
 const transferEvent = "event Transfer(address indexed from, address indexed to, uint256 amount)"
@@ -36,7 +37,6 @@ const handleTransaction = async (txEvent) => {
         return { type, symbol }
       })
 
-      console.log(interactions)
   if (interactions.length === 0) return findings
 
   // Get action (mint, redeem or mint and redeem)
@@ -46,8 +46,7 @@ const handleTransaction = async (txEvent) => {
   if (hasAaveFlashloan(txEvent)) flashloanProtocols.push("Aave")
   if (hasDydxFlashloan(txEvent)) flashloanProtocols.push("dYdX")
   if (hasMakerFlashloan(txEvent)) flashloanProtocols.push("MakerDAO")
-
-  // check euler
+  if (hasEulerFlashloan(txEvent)) flashloanProtocols.push("Euler")
 
   if (flashloanProtocols.length > 0) {
     findings.push(createAlert(interactions, flashloanProtocols, action))
