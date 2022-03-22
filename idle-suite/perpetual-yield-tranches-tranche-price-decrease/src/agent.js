@@ -22,8 +22,8 @@ const handleBlock = async (blockEvent) => {
     const oldPriceAA = cdo["AATrancheToken"].oldPrice
     const oldPriceBB = cdo["BBTrancheToken"].oldPrice
 
-    // The even elements are AA tranchePrice
-    // The odd elemets are BB tranchePrice
+    // The even elements are AA (senior) tranchePrices
+    // The odd elemets are BB (junior) tranchePrices
     const currentPriceAA = tokenPrices[2*i]
     const currentPriceBB = tokenPrices[2*i + 1]
 

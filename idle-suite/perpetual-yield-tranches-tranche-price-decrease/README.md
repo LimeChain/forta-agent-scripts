@@ -1,8 +1,8 @@
-# Best Yield Token Price Decrease
+# Perpetual Yield Tranches Tranche Price Decrease
 
 ## Description
 
-Detects if the tokenPrice of any IDLE token has decreased
+Detects if the tranchePrice of any tranche has decreased
 
 ## Supported Chains
 
@@ -10,10 +10,11 @@ Detects if the tokenPrice of any IDLE token has decreased
 
 ## Alerts
 
-- IDLE-BEST-YIELD-TOKEN-PRICE-DECREASE
-  - Fired when a the tokenPrice of any IDLE token has decreased
+- IDLE-PERPETUAL-YIELD-TRANCHES-TRANCHE-PRICE-DECREASE
+  - Fired when a the tranchePrice of any tranche has decreased
   - Severity is always set to "medium"
   - Type is always set to "info"
   - Metadata:
     - "price" - the current price of the token
     - "oldPrice" - the old price of the token
+    - "trancheType" - "AA" for senior tranches and "BB" for junior tranches
