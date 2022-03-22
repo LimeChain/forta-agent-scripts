@@ -31,14 +31,14 @@ const tokenAbi = [
 
 // For each CDO get the virtualPrice for the AA and the BB tranches
 async function getVirtualPrices(cdos) {
-  const tokenPriceCalls = cdos.map(cdo => {
+  const virtualPriceCalls = cdos.map(cdo => {
     const contract = cdo.contract
     return [
       contract.virtualPrice(cdo["AATrancheToken"].id),
       contract.virtualPrice(cdo["BBTrancheToken"].id)
     ]
   }).flat()
-  return ethcallProvider.all(tokenPriceCalls)
+  return ethcallProvider.all(virtualPriceCalls)
 }
 
 module.exports = {
