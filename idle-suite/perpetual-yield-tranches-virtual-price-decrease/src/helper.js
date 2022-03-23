@@ -9,6 +9,7 @@ const payload = {
   query: `{
         cdos {
           id
+          strategyToken
           AATrancheToken {
             id
           }
@@ -20,7 +21,6 @@ const payload = {
 }
 
 const cdoAbi = [
-  "function strategyToken() external view returns (address)",
   "function virtualPrice(address _tranche) external view returns (uint256)"
 ]
 
@@ -46,12 +46,9 @@ module.exports = {
     // Get all CDOs from the subgraph
     const response = await axios.post(theGraphApiUrl, JSON.stringify(payload))
     const cdos = response.data.data.cdos
-    const cdoContracts = cdos.map(cdo => new Contract(cdo.id, cdoAbi))
 
-    // Get the strategyToken for each CDO
-    const strategyTokenCalls = cdoContracts.map(contract => contract.strategyToken())
-    const strategyTokens = await ethcallProvider.all(strategyTokenCalls)
-    const tokenContracts = strategyTokens.map(address => new Contract(address, tokenAbi))
+    const cdoContracts = cdos.map(cdo => new Contract(cdo.id, cdoAbi))
+    const tokenContracts = cdos.map(cdo => new Contract(cdo.strategyToken, tokenAbi))
 
     // Get The symbol of the strategyToken
     const tokenSymbolCalls = tokenContracts.map(contract => contract.symbol())
