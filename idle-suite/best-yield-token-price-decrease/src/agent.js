@@ -40,8 +40,8 @@ function createAlert(symbol, price, oldPrice, decimals) {
     description: `The token price of ${symbol} has decreased`,
     alertId: "IDLE-BEST-YIELD-TOKEN-PRICE-DECREASE",
     protocol: "idlefi",
-    severity: FindingSeverity.Medium,
-    type: FindingType.Info,
+    severity: FindingSeverity.Critical,
+    type: FindingType.Suspicious,
     metadata: {
       price: ethers.utils.formatUnits(price, decimals),
       oldPrice: ethers.utils.formatUnits(oldPrice, decimals)
