@@ -1,8 +1,8 @@
-# Perpetual Yield Tranches Virtual Price Decrease
+# Perpetual Yield Tranches Large Change in Contract Value
 
 ## Description
 
-Detects if the virtualPrice of any tranche has decreased
+Detects if the contract value of CDO changes drastically
 
 ## Supported Chains
 
@@ -10,11 +10,11 @@ Detects if the virtualPrice of any tranche has decreased
 
 ## Alerts
 
-- IDLE-PERPETUAL-YIELD-TRANCHES-VIRTUAL-PRICE-DECREASE
-  - Fired when a the virtualPrice of any tranche has decreased
+- IDLE-PERPETUAL-YIELD-TRANCHES-DRASTIC-CHANGE-IN-CONTRACT-VALUE
+  - Fired when the contract value of CDO changes drastically
   - Severity is always set to "medium"
   - Type is always set to "info"
   - Metadata:
-    - "price" - the current price of the token
-    - "oldPrice" - the old price of the token
-    - "trancheType" - "AA" for senior tranches and "BB" for junior tranches
+    - "value" - the current contract value
+    - "oldValue" - the old contract value
+    - "cdo" - the cdo's symbol
