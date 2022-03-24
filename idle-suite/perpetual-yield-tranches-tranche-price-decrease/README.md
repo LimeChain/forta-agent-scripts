@@ -11,7 +11,7 @@ Detects if the tranchePrice of any tranche has decreased
 ## Alerts
 
 - IDLE-PERPETUAL-YIELD-TRANCHES-TRANCHE-PRICE-DECREASE
-  - Fired when a the tranchePrice of any tranche has decreased
+  - Fired when the tranchePrice of any tranche has decreased
   - Severity is always set to "medium"
   - Type is always set to "info"
   - Metadata:
