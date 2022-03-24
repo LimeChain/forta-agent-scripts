@@ -47,12 +47,13 @@ function createAlert(symbol, price, oldPrice, decimals, trancheType) {
     description: `The ${trancheType} virtual price of the ${symbol} CDO has decreased`,
     alertId: "IDLE-PERPETUAL-YIELD-TRANCHES-VIRTUAL-PRICE-DECREASE",
     protocol: "idlefi",
-    severity: FindingSeverity.Medium,
-    type: FindingType.Info,
+    severity: FindingSeverity.Critical,
+    type: FindingType.Suspicious,
     metadata: {
       price: ethers.utils.formatUnits(price, decimals),
       oldPrice: ethers.utils.formatUnits(oldPrice, decimals),
-      trancheType
+      trancheType,
+      symbol
     }
   })
 }

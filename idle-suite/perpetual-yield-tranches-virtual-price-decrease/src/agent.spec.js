@@ -55,12 +55,13 @@ describe("perpetual yield tranches virtual price decrease agent", () => {
           description: `The BB virtual price of the ${tokenSymbol} CDO has decreased`,
           alertId: "IDLE-PERPETUAL-YIELD-TRANCHES-VIRTUAL-PRICE-DECREASE",
           protocol: "idlefi",
-          severity: FindingSeverity.Medium,
-          type: FindingType.Info,
+          severity: FindingSeverity.Critical,
+          type: FindingType.Suspicious,
           metadata: {
             oldPrice: "100.0",
             price: "99.0",
             trancheType: "BB",
+            symbol: tokenSymbol
           }
         }),
       ])
