@@ -14,7 +14,7 @@ const handleBlock = async (blockEvent) => {
   const findings = []
 
   // 5 per minute * 10 minutes
-  // if (blockEvent.blockNumber % 50 != 0) return findings
+  if (blockEvent.blockNumber % 50 != 0) return findings
   
   const prices = await getPrices(strategies)
 
