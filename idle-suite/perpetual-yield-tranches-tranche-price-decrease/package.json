@@ -2,6 +2,8 @@
   "name": "idlefi-perpetual-yield-tranches-tranche-price-decrease",
   "version": "0.0.1",
   "description": "Detects if the tranchePrice of any tranche has decreased",
+  "chainIds": [ 1 ],
+  "repository": "https://github.com/LimeChain/forta-agent-scripts",
   "scripts": {
     "start": "npm run start:dev",
     "start:dev": "nodemon --watch src --watch forta.config.json -e js,json --exec \"forta-agent run\"",
