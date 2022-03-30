@@ -19,7 +19,8 @@
   },
   "dependencies": {
     "ethers-multicall": "^0.2.2",
-    "forta-agent": "^0.0.39"
+    "forta-agent": "^0.0.41",
+    "forta-flashloan-detector": "^1.0.3"
   },
   "devDependencies": {
     "jest": "^27.0.6",

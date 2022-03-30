@@ -4,7 +4,7 @@ const {
   Finding,
   ethers
 } = require("forta-agent")
-const { handleTransaction, provideInitialize, setMarkets } = require("./agent")
+const { handleTransaction, provideInitialize } = require("./agent")
 
 const symbol = "idleDAIYield"
 const marketAddress = "0xmarket"
@@ -39,60 +39,25 @@ markets[marketAddress] = {
   contract: { tokenPrice: () => {} }
 }
 
-const mockIronBankEvent = {
-  address: "ironBankEvent",
-}
-const mockAaveEvent = {
-  address: "aaveAddress",
-}
-const mockDydxWithdrawEvent = {
-  args: {
-    market: ethers.constants.Zero,
-    update: {
-      deltaWei: {
-        sign: false,
-        value: ethers.BigNumber.from(10)
-      }
-    }
-  }
-}
-const mockDydxDepositEvent = {
-  args: {
-    market: ethers.constants.Zero,
-    update: {
-      deltaWei: {
-        sign: true,
-        value: ethers.BigNumber.from(12)
-      }
-    }
-  }
-}
-const mockMakerEvent = {
-  address: "maker",
-}
-const mockEulerBorrowEvent = {
-  name: "RequestBorrow",
-  address: "0x62e28f054efc24b26a794f5c1249b6349454352c",
-  args: { amount }
-}
-const mockEulerRepayEvent = {
-  name: "RequestRepay",
-  address: "0x62e28f054efc24b26a794f5c1249b6349454352c",
-  args: { amount }
-}
-
-describe("best yield token price decrease agent", () => {
+describe("best yield token mint or redeem with flash loan", () => {
   const mockTxEvent = { filterLog: jest.fn() }
 
-  const mockInit = () => { setMarkets(markets) }
+  const mockDetector = {
+    init: () => {},
+    getFlashloans: jest.fn()
+  }
+
+  const mockInit = () => {}
+  const mockGetMarkets = () => markets
 
   beforeAll(async () => {
-    const initialize = provideInitialize(mockInit)
+    const initialize = provideInitialize(mockInit, mockGetMarkets, mockDetector)
     await initialize()
   })
 
   beforeEach(() => {
     mockTxEvent.filterLog.mockReset()
+    mockDetector.getFlashloans.mockReset()
   })
 
   describe("handleTransaction", () => {
@@ -105,11 +70,7 @@ describe("best yield token price decrease agent", () => {
 
     it("returns a finding if there is a redeem event with Iron Bank flashloan", async () => {
       mockTxEvent.filterLog.mockReturnValueOnce([mockRedeemEvent])
-      mockTxEvent.filterLog.mockReturnValueOnce([mockIronBankEvent]) // Iron Bank flashloan check
-      mockTxEvent.filterLog.mockReturnValueOnce([]) // AAVE flashloan check
-      mockTxEvent.filterLog.mockReturnValueOnce([]) // dydx flashloan check
-      mockTxEvent.filterLog.mockReturnValueOnce([]) // Maker flashloan check
-      mockTxEvent.filterLog.mockReturnValueOnce([]) // Euler flashloan check
+      mockDetector.getFlashloans.mockReturnValueOnce(['Iron Bank'])
       const findings = await handleTransaction(mockTxEvent)
 
       expect(findings).toStrictEqual([
@@ -130,11 +91,7 @@ describe("best yield token price decrease agent", () => {
 
     it("returns a finding if there is a mint event with Aave flashloan", async () => {
       mockTxEvent.filterLog.mockReturnValueOnce([mockMintEvent])
-      mockTxEvent.filterLog.mockReturnValueOnce([]) // Iron Bank flashloan check
-      mockTxEvent.filterLog.mockReturnValueOnce([mockAaveEvent]) // AAVE flashloan check
-      mockTxEvent.filterLog.mockReturnValueOnce([]) // dydx flashloan check
-      mockTxEvent.filterLog.mockReturnValueOnce([]) // Maker flashloan check
-      mockTxEvent.filterLog.mockReturnValueOnce([]) // Euler flashloan check
+      mockDetector.getFlashloans.mockReturnValueOnce(['Aave'])
       const findings = await handleTransaction(mockTxEvent)
 
       expect(findings).toStrictEqual([
@@ -155,11 +112,7 @@ describe("best yield token price decrease agent", () => {
 
     it("returns a finding if there is a mint event with dydx, MakerDAO and Euler flashloan", async () => {
       mockTxEvent.filterLog.mockReturnValueOnce([mockMintEvent])
-      mockTxEvent.filterLog.mockReturnValueOnce([]) // Iron Bank flashloan check
-      mockTxEvent.filterLog.mockReturnValueOnce([]) // AAVE flashloan check
-      mockTxEvent.filterLog.mockReturnValueOnce([mockDydxWithdrawEvent, mockDydxDepositEvent]) // dydx flashloan check
-      mockTxEvent.filterLog.mockReturnValueOnce([mockMakerEvent]) // Maker flashloan check
-      mockTxEvent.filterLog.mockReturnValueOnce([mockEulerBorrowEvent, mockEulerRepayEvent]) // Euler flashloan check
+      mockDetector.getFlashloans.mockReturnValueOnce(["dYdX", "Euler", "MakerDAO"])
       const findings = await handleTransaction(mockTxEvent)
 
       expect(findings).toStrictEqual([
@@ -172,7 +125,7 @@ describe("best yield token price decrease agent", () => {
           type: FindingType.Info,
           metadata: {
             interactions: [{ type: "Mint", symbol }],
-            protocols: [ "dYdX", "MakerDAO", "Euler" ]
+            protocols: [ "dYdX", "Euler", "MakerDAO" ]
           }
         }),
       ])
