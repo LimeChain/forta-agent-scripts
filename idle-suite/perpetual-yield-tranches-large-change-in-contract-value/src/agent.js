@@ -25,10 +25,10 @@ const handleBlock = async (blockEvent) => {
     const oldContractValue = cdo.oldContractValue
     const currentContractValue = values[i]
 
-    const difference = Math.abs(currentContractValue - oldContractValue)
+    const difference = currentContractValue - oldContractValue
 
-    if (difference > VALUE_DIFFERENCE_THRESHOLD) {
-      findings.push(createAlert(cdo.tokenSymbol, currentContractValue, oldContractValue))
+    if (Math.abs(difference) > VALUE_DIFFERENCE_THRESHOLD) {
+      findings.push(createAlert(cdo.tokenSymbol, currentContractValue, oldContractValue, difference))
     }
 
     // Update the contractValue
@@ -38,10 +38,10 @@ const handleBlock = async (blockEvent) => {
   return findings
 }
 
-function createAlert(symbol, value, oldValue) {
+function createAlert(symbol, value, oldValue, difference) {
   return Finding.fromObject({
     name: "Perpetual Yield Tranches Large Change in Contract Value",
-    description: `The contractValue of the ${symbol} CDO has changed drastically`,
+    description: `The contractValue of the ${symbol} CDO has changed by $${difference}`,
     alertId: "IDLE-PERPETUAL-YIELD-TRANCHES-DRASTIC-CHANGE-IN-CONTRACT-VALUE",
     protocol: "idlefi",
     severity: FindingSeverity.Medium,

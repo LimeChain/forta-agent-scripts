@@ -50,7 +50,7 @@ describe("perpetual yield tranches large change in contract value agent", () => 
       expect(findings).toStrictEqual([
         Finding.fromObject({
           name: "Perpetual Yield Tranches Large Change in Contract Value",
-          description: `The contractValue of the ${tokenSymbol} CDO has changed drastically`,
+          description: `The contractValue of the ${tokenSymbol} CDO has changed by $${value-oldValue}`,
           alertId: "IDLE-PERPETUAL-YIELD-TRANCHES-DRASTIC-CHANGE-IN-CONTRACT-VALUE",
           protocol: "idlefi",
           severity: FindingSeverity.Medium,
