@@ -2,23 +2,24 @@ const { Finding, FindingSeverity, FindingType, ethers } = require("forta-agent")
 const {
   init,
   getMarkets,
-  setMarkets,
   getAction,
-  hasIronBankFlashloan,
-  hasAaveFlashloan,
-  hasDydxFlashloan,
-  hasMakerFlashloan,
-  hasEulerFlashloan
 } = require("./helper")
+const FlashloanDetector = require('forta-flashloan-detector')
 
 const transferEvent = "event Transfer(address indexed from, address indexed to, uint256 amount)"
 const addressZero = ethers.constants.AddressZero
 
 let markets
 let marketsAddresses
-function provideInitialize(init) {
+let flashloanDetector
+
+function provideInitialize(init, getMarkets, detector) {
   return async function initialize() {
     await init()
+
+    flashloanDetector = detector
+    await flashloanDetector.init()
+
     markets = getMarkets()
     marketsAddresses = Object.keys(markets)
   }
@@ -26,7 +27,6 @@ function provideInitialize(init) {
 
 const handleTransaction = async (txEvent) => {
   const findings = []
-  const flashloanProtocols = []
 
   // Check if there is a mint or redeem
   const interactions = txEvent.filterLog(transferEvent, marketsAddresses)
@@ -42,11 +42,8 @@ const handleTransaction = async (txEvent) => {
   // Get action (mint, redeem or mint and redeem)
   const action = getAction(interactions)
 
-  if (hasIronBankFlashloan(txEvent)) flashloanProtocols.push("Iron Bank")
-  if (hasAaveFlashloan(txEvent)) flashloanProtocols.push("Aave")
-  if (hasDydxFlashloan(txEvent)) flashloanProtocols.push("dYdX")
-  if (hasMakerFlashloan(txEvent)) flashloanProtocols.push("MakerDAO")
-  if (hasEulerFlashloan(txEvent)) flashloanProtocols.push("Euler")
+  // Check if there is a flashloan
+  const flashloanProtocols = flashloanDetector.getFlashloans(txEvent);
 
   if (flashloanProtocols.length > 0) {
     findings.push(createAlert(interactions, flashloanProtocols, action))
@@ -71,8 +68,7 @@ function createAlert(interactions, protocols, action) {
 }
 
 module.exports = {
-  initialize: provideInitialize(init),
+  initialize: provideInitialize(init, getMarkets, new FlashloanDetector()),
   provideInitialize,
   handleTransaction,
-  setMarkets, // For mocking the Idle markets
 }
