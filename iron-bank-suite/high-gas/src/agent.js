@@ -19,10 +19,6 @@ function provideInitialize(getMarkets) {
   };
 }
 
-async function getTxReceipt(txHash) {
-  return await getTransactionReceipt(txHash);
-}
-
 function provideHandleTransaction(getTxReceipt) {
   return async function handleTransaction(txEvent) {
     const findings = [];
@@ -60,6 +56,6 @@ function provideHandleTransaction(getTxReceipt) {
 module.exports = {
   initialize: provideInitialize(getMarkets),
   provideInitialize,
-  handleTransaction: provideHandleTransaction(getTxReceipt),
+  handleTransaction: provideHandleTransaction(getTransactionReceipt),
   provideHandleTransaction,
 };
