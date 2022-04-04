@@ -26,7 +26,7 @@ describe("high-gas agent", () => {
     handleTransaction = provideHandleTransaction(mockGetTxReceipt);
   });
 
-  const createTxEvent = ({ gasUsed, addresses }) =>
+  const createTxEvent = ({ addresses }) =>
     createTransactionEvent({
       transaction: { hash: "0x0" },
 
@@ -39,7 +39,6 @@ describe("high-gas agent", () => {
       const gasUsed = `0x${gasUsedDecimal.toString(16)}`;
       mockGetTxReceipt.mockResolvedValueOnce({ gasUsed });
       const txEvent = createTxEvent({
-        gasUsed,
         addresses: { [market]: true },
       });
 
@@ -53,7 +52,6 @@ describe("high-gas agent", () => {
       const gasUsed = `0x${gasUsedDecimal.toString(16)}`;
       mockGetTxReceipt.mockResolvedValueOnce({ gasUsed });
       const txEvent = createTxEvent({
-        gasUsed,
         addresses: { [market]: true },
       });
       const findings = await handleTransaction(txEvent);
