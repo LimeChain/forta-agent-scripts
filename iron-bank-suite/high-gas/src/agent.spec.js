@@ -2,52 +2,61 @@ const {
   FindingType,
   FindingSeverity,
   Finding,
-  createTransactionEvent
-} = require("forta-agent")
-const { handleTransaction, provideInitialize } = require("./agent")
+  createTransactionEvent,
+} = require("forta-agent");
 
-const market = "0x41c84c0e2ee0b740cf0d31f63f3b6f627dc6b393"
+const { provideHandleTransaction, provideInitialize } = require("./agent");
+
+const market = "0x41c84c0e2ee0b740cf0d31f63f3b6f627dc6b393";
 
 describe("high-gas agent", () => {
-  const markets = {}
-  markets[market] = { 
+  let handleTransaction;
+  const markets = {};
+  markets[market] = {
     name: "cyWETH",
-    decimalsUnderlying: 18
-  }
-  const mockGetMarkets = () => markets
+    decimalsUnderlying: 18,
+  };
+  const mockGetMarkets = () => markets;
+
+  const mockGetTxReceipt = jest.fn();
 
   beforeAll(async () => {
-    const initialize = provideInitialize(mockGetMarkets)
-    await initialize()
-  })
+    const initialize = provideInitialize(mockGetMarkets);
+    await initialize();
+    handleTransaction = provideHandleTransaction(mockGetTxReceipt);
+  });
 
   const createTxEvent = ({ gasUsed, addresses }) =>
     createTransactionEvent({
+      transaction: { hash: "0x0" },
       receipt: { gasUsed },
       addresses,
-    })
+    });
 
   describe("handleTransaction", () => {
     it("returns empty findings if there isn't a high gas usage", async () => {
-      const gasUsedDecimal = 100_000
-      const gasUsed = `0x${gasUsedDecimal.toString(16)}`
+      const gasUsedDecimal = 100_000;
+      const gasUsed = `0x${gasUsedDecimal.toString(16)}`;
+      mockGetTxReceipt.mockResolvedValueOnce({ gasUsed });
       const txEvent = createTxEvent({
         gasUsed,
-        addresses: { [market]: true }
-      })
-      const findings = await handleTransaction(txEvent)
+        addresses: { [market]: true },
+      });
 
-      expect(findings).toStrictEqual([])
+      const findings = await handleTransaction(txEvent);
+
+      expect(findings).toStrictEqual([]);
     });
 
-    it("returns a finding if there is a high gas usage", async () => {      
-      const gasUsedDecimal = 4_000_000
-      const gasUsed = `0x${gasUsedDecimal.toString(16)}`
+    it("returns a finding if there is a high gas usage", async () => {
+      const gasUsedDecimal = 4_000_000;
+      const gasUsed = `0x${gasUsedDecimal.toString(16)}`;
+      mockGetTxReceipt.mockResolvedValueOnce({ gasUsed });
       const txEvent = createTxEvent({
         gasUsed,
-        addresses: { [market]: true }
-      })
-      const findings = await handleTransaction(txEvent)
+        addresses: { [market]: true },
+      });
+      const findings = await handleTransaction(txEvent);
 
       expect(findings).toStrictEqual([
         Finding.fromObject({
@@ -61,7 +70,7 @@ describe("high-gas agent", () => {
             gasUsed: gasUsedDecimal.toString(),
           },
         }),
-      ])
-    })
-  })
-})
+      ]);
+    });
+  });
+});
