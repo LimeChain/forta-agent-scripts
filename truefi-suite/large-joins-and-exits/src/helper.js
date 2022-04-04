@@ -1,12 +1,18 @@
 const { Contract, Provider } = require('ethers-multicall');
+const axios = require('axios').default;
 const {
   Finding,
   FindingSeverity,
   FindingType,
   getEthersProvider,
+  ethers,
 } = require('forta-agent');
 
 const ethcallProvider = new Provider(getEthersProvider(), 1);
+
+const poolFactory = '0x1391d9223e08845e536157995085fe0cef8bd393';
+const topic = '0x4f2ce4e40f623ca765fc0167a25cb7842ceaafb8d82d3dec26ca0d0e0d2d4896'; // PoolCreated event
+const etherscanUrl = `https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=12471560&toBlock=latest&address=${poolFactory}&topic0=${topic}&apikey=YourApiKeyToken`;
 
 const poolAbi = [
   'function symbol() external view returns (string memory)',
@@ -18,12 +24,12 @@ module.exports = {
   exitedEventSig: 'event Exited(address indexed staker, uint256 amount)',
 
   getPools: async () => {
-    const poolAddresses = [
-      '0x97ce06c3e3d027715b2d6c22e67d5096000072e5',
-      '0xa991356d261fbaf194463af6df8f0464f8f1c742',
-      '0x6002b1dcb26e7b1aa797a17551c6f487923299d7',
-      '0x1ed460d149d48fa7d91703bf4890f97220c09437',
-    ];
+    // Get the addresses of the pools from Etherscan
+    const results = (await axios.get(etherscanUrl)).data.result;
+    const poolAddresses = results.map((result) => {
+      const { pool } = ethers.utils.defaultAbiCoder.decode(['address token', 'address pool'], result.data);
+      return pool.toLowerCase();
+    });
 
     const poolContracts = poolAddresses.map((address) => new Contract(address, poolAbi));
 

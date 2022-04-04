@@ -20,8 +20,9 @@
     "test": "jest"
   },
   "dependencies": {
+    "axios": "^0.26.1",
     "ethers-multicall": "^0.2.2",
-    "forta-agent": "^0.0.41"
+    "forta-agent": "^0.1.0"
   },
   "devDependencies": {
     "eslint": "^8.12.0",
