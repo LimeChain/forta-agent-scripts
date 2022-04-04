@@ -29,7 +29,7 @@ describe("high-gas agent", () => {
   const createTxEvent = ({ gasUsed, addresses }) =>
     createTransactionEvent({
       transaction: { hash: "0x0" },
-      receipt: { gasUsed },
+
       addresses,
     });
 
