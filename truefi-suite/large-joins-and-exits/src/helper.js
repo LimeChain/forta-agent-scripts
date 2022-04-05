@@ -5,14 +5,18 @@ const {
   FindingSeverity,
   FindingType,
   getEthersProvider,
-  ethers,
 } = require('forta-agent');
 
 const ethcallProvider = new Provider(getEthersProvider(), 1);
 
-const poolFactory = '0x1391d9223e08845e536157995085fe0cef8bd393';
-const topic = '0x4f2ce4e40f623ca765fc0167a25cb7842ceaafb8d82d3dec26ca0d0e0d2d4896'; // PoolCreated event
-const etherscanUrl = `https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=12471560&toBlock=latest&address=${poolFactory}&topic0=${topic}&apikey=YourApiKeyToken`;
+const subgraphUrl = 'https://api.thegraph.com/subgraphs/name/mikemccready/truefi-pools';
+const payload = {
+  query: `{
+    poolValues(where: {id_not_in: ["TVL"]}) {
+      id
+    }
+  }`,
+};
 
 const poolAbi = [
   'function symbol() external view returns (string memory)',
@@ -24,12 +28,9 @@ module.exports = {
   exitedEventSig: 'event Exited(address indexed staker, uint256 amount)',
 
   getPools: async () => {
-    // Get the addresses of the pools from Etherscan
-    const results = (await axios.get(etherscanUrl)).data.result;
-    const poolAddresses = results.map((result) => {
-      const { pool } = ethers.utils.defaultAbiCoder.decode(['address token', 'address pool'], result.data);
-      return pool.toLowerCase();
-    });
+    // Get the addresses of the pools from the subgraph
+    const response = await axios.post(subgraphUrl, JSON.stringify(payload));
+    const poolAddresses = response.data.data.poolValues.map((pool) => pool.id.toLowerCase());
 
     const poolContracts = poolAddresses.map((address) => new Contract(address, poolAbi));
 
