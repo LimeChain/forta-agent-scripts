@@ -2,16 +2,34 @@ const {
   FindingType,
   FindingSeverity,
   Finding,
-  createTransactionEvent,
+  HandleTransaction,
+  TransactionEvent,
 } = require("forta-agent");
 
-const { provideHandleTransaction, provideInitialize } = require("./agent.ts");
+import { HandleTransaction } from "forta-agent";
+import { encodeEventSignature, encodeParameter } from "forta-agent-tools";
+
+const tokenAbi: string[] = [
+  "function symbol() external view returns (string memory)",
+  "function underlying() public view returns (address)",
+  "function decimals() external view returns (uint8)",
+];
+
+import {
+  createAddress,
+  TestTransactionEvent,
+} from "forta-agent-tools/lib/tests";
+
+const { provideHandleTransaction, provideInitialize } = require("./agent");
 
 const market = "0x41c84c0e2ee0b740cf0d31f63f3b6f627dc6b393";
 
 describe("high-gas agent", () => {
-  let handleTransaction;
-  const markets = {};
+  let handleTransaction: HandleTransaction;
+  const markets: {
+    [key: string]: { name: string; decimalsUnderlying: number };
+  } = {};
+
   markets[market] = {
     name: "cyWETH",
     decimalsUnderlying: 18,
@@ -26,21 +44,14 @@ describe("high-gas agent", () => {
     handleTransaction = provideHandleTransaction(mockGetTxReceipt);
   });
 
-  const createTxEvent = ({ addresses }) =>
-    createTransactionEvent({
-      transaction: { hash: "0x0" },
-
-      addresses,
-    });
-
   describe("handleTransaction", () => {
     it("returns empty findings if there isn't a high gas usage", async () => {
       const gasUsedDecimal = 100_000;
       const gasUsed = `0x${gasUsedDecimal.toString(16)}`;
       mockGetTxReceipt.mockResolvedValueOnce({ gasUsed });
-      const txEvent = createTxEvent({
-        addresses: { [market]: true },
-      });
+      const txEvent = new TestTransactionEvent();
+      txEvent.setFrom("0x0");
+      txEvent.addEventLog(encodeEventSignature(tokenAbi[0]), "0x2", "0x");
 
       const findings = await handleTransaction(txEvent);
 

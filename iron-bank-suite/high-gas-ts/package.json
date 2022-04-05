@@ -20,7 +20,8 @@
   },
   "dependencies": {
     "ethers-multicall": "^0.2.2",
-    "forta-agent": "^0.1.0"
+    "forta-agent": "^0.1.0",
+    "forta-agent-tools": "^2.0.4"
   },
   "devDependencies": {
     "@types/jest": "^27.0.1",

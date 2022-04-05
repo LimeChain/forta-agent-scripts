@@ -1,5 +1,3 @@
-import { Interface } from "@ethersproject/abi";
-
 const { ethers, getEthersProvider } = require("forta-agent");
 const { Contract, Provider } = require("ethers-multicall");
 
