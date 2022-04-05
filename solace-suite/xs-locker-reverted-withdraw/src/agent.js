@@ -30,7 +30,7 @@ function provideHandleTransaction(getTxReceipt) {
     if (!isWithdraw) return findings;
 
     const { status, gasUsed } = await getTxReceipt(txEvent.hash);
-    await console.log("Status: " + status + " " + "GasUsed: " + gasUsed);
+
     // Return if the transaction is successful
     if (status) return findings;
 
