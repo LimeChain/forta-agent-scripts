@@ -29,10 +29,6 @@ describe('pool upgraded bot', () => {
     await initialize();
   });
 
-  // beforeEach(() => {
-  //   mockTxEvent.filterLog.mockReset();
-  // });
-
   describe('handleBlock', () => {
     it('returns empty findings if the the implementation has not changed', async () => {
       mockGetImplementations.mockResolvedValueOnce([oldImplementation]);
