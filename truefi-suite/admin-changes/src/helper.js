@@ -28,6 +28,8 @@ module.exports = {
     'event PauseStatusChanged(bool pauseStatus)',
     'event SafuChanged(address newSafu)',
     'event CreditAgencyChanged(address newCreditAgency)',
+    'event OwnershipTransferred(address indexed previousOwner, address indexed newOwner)',
+    'event ProxyOwnershipTransferred(address indexed previousOwner, address indexed newOwner)',
   ],
 
   getPools: async () => {
